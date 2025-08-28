@@ -19,8 +19,9 @@ export const ThemeProvider = ({ children }) => {
         if (savedTheme) {
             setIsDarkMode(savedTheme === 'dark')
         } else {
-            // Default to dark mode
+            // Always default to dark mode for professional trading platform
             setIsDarkMode(true)
+            localStorage.setItem('theme', 'dark')
         }
     }, [])
 
