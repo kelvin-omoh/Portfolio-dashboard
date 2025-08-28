@@ -1,9 +1,28 @@
 import { useDashboard } from '../contexts/DashboardContext'
 import { useTheme } from '../contexts/ThemeContext'
+import { useState, useEffect } from 'react'
 
 const Header = () => {
   const { portfolio } = useDashboard()
   const { isDarkMode, toggleTheme } = useTheme()
+  const [tradingStats, setTradingStats] = useState({
+    totalShares: 21000000,
+    dailyVolume: 8750000,
+    systemLatency: 0
+  })
+
+  // Real-time trading stats updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTradingStats(prev => ({
+        totalShares: prev.totalShares + Math.floor(Math.random() * 75000) + 15000, // Faster growth
+        dailyVolume: prev.dailyVolume + Math.floor(Math.random() * 40000) + 8000, // More aggressive volume
+        systemLatency: Math.random() * 15 + 2 // 2-17ms realistic latency
+      }))
+    }, 750) // Very fast updates - every 750ms
+
+    return () => clearInterval(interval)
+  }, [])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-NG', {
@@ -14,8 +33,57 @@ const Header = () => {
     }).format(amount)
   }
 
+  const formatNumber = (num) => {
+    if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M'
+    if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K'
+    return num.toString()
+  }
+
+  const formatLatency = (latency) => {
+    return `${latency.toFixed(1)}ms`
+  }
+
   return (
     <header className={`${isDarkMode ? 'glass' : 'card-light'} border-b border-opacity-20 theme-transition sticky top-0 z-50`}>
+      {/* Live Trading Statistics Bar */}
+      <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} border-b border-opacity-10`}>
+        <div className="container mx-auto px-6 py-2">
+          <div className="flex items-center justify-center space-x-8">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className={`text-xs font-satoshi ${isDarkMode ? 'text-white/80' : 'text-black/80'}`}>
+                Total Volume:
+              </span>
+              <span className={`text-xs font-bold font-satoshi ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                {formatNumber(tradingStats.totalShares)}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className={`text-xs font-satoshi ${isDarkMode ? 'text-white/80' : 'text-black/80'}`}>
+                Daily Volume:
+              </span>
+              <span className={`text-xs font-bold font-satoshi ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                {formatNumber(tradingStats.dailyVolume)}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+              <span className={`text-xs font-satoshi ${isDarkMode ? 'text-white/80' : 'text-black/80'}`}>
+                System Latency:
+              </span>
+              <span className={`text-xs font-bold font-satoshi ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+                {formatLatency(tradingStats.systemLatency)}
+              </span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className={`text-xs font-satoshi ${isDarkMode ? 'text-white/60' : 'text-black/60'}`}>
+                LIVE
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
@@ -24,13 +92,14 @@ const Header = () => {
               ? 'bg-white text-black shadow-lg'
               : 'bg-black text-white shadow-lg'
               }`}>
-              <span className="font-bold text-2xl font-ivy">Q</span>
+              <span className="font-bold text-2xl font-ivy">R</span>
             </div>
             <div>
               <h1 className={`text-3xl font-bold font-ivy ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                Quant Analytics
+                Ricardian Trading
+                <span className="text-lg font-medium text-blue-500 ml-2">by Ricardian Corp</span>
               </h1>
-              <p className="text-sm font-satoshi opacity-70 mt-1">Real-time Portfolio Dashboard</p>
+              <p className="text-sm font-satoshi opacity-70 mt-1">Professional HFT Platform • NSE & Crypto Markets • Ultra-Low Latency</p>
             </div>
           </div>
 
@@ -49,7 +118,7 @@ const Header = () => {
             <div className="text-center">
               <p className="text-sm opacity-70 font-satoshi mb-1">Change %</p>
               <p className={`text-xl font-semibold font-satoshi ${portfolio.dailyChangePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {portfolio.dailyChangePercent >= 0 ? '+' : ''}{portfolio.dailyChangePercent}%
+                {portfolio.dailyChangePercent >= 0 ? '+' : ''}{portfolio.dailyChangePercent.toFixed(1)}%
               </p>
             </div>
           </div>

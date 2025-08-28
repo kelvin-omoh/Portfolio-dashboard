@@ -1,8 +1,26 @@
 {
-  "name": "ricardian",
+  "name": "ricardian-trading-platform",
+  "version": "1.0.0",
+  "description": "Professional High-Frequency Trading Platform by Ricardian Corp",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "author": "Ricardian Corp <contact@ricardian.com>",
+  "homepage": "https://trading.ricardian.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ricardian-corp/trading-platform.git"
+  },
+  "keywords": [
+    "trading",
+    "hft",
+    "high-frequency-trading",
+    "portfolio-management",
+    "financial-analytics",
+    "nse",
+    "cryptocurrency",
+    "real-time",
+    "ricardian-corp"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

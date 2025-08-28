@@ -5,119 +5,310 @@ import { useState, useEffect } from 'react'
 const PortfolioSummary = () => {
   const { portfolio, marketData } = useDashboard()
   const { isDarkMode } = useTheme()
-  const [livePositions, setLivePositions] = useState([])
-  const [portfolioMetrics, setPortfolioMetrics] = useState({
-    totalValue: 0,
-    dailyChange: 0,
-    dailyChangePercent: 0,
-    totalPnL: 0,
-    totalPnLPercent: 0,
-    volatility: 0,
-    sharpeRatio: 0,
-    maxDrawdown: 0,
-    beta: 0,
-    alpha: 0
-  })
-  const [selectedTimeframe, setSelectedTimeframe] = useState('1D')
+  const [orders, setOrders] = useState([])
   const [isUpdating, setIsUpdating] = useState(false)
+  const [highlightedRows, setHighlightedRows] = useState(new Set())
+  const [orderFlow, setOrderFlow] = useState({ buys: 0, sells: 0, volume: 0 })
+  const [marketDepth, setMarketDepth] = useState({ bidCount: 0, askCount: 0 })
+  const [systemLatency, setSystemLatency] = useState(0)
 
-  // Generate dynamic portfolio positions with real-time data
+  // Generate initial trading orders
   useEffect(() => {
-    const generatePositions = () => {
-      const symbols = [
-        { symbol: 'MTN', name: 'MTN Nigeria', exchange: 'NSE', sector: 'Telecommunications' },
-        { symbol: 'DANGOTE', name: 'Dangote Cement', exchange: 'NSE', sector: 'Industrial Goods' },
-        { symbol: 'ZENITH', name: 'Zenith Bank', exchange: 'NSE', sector: 'Financial Services' },
-        { symbol: 'GTCO', name: 'GTCO Plc', exchange: 'NSE', sector: 'Financial Services' },
-        { symbol: 'ACCESS', name: 'Access Bank', exchange: 'NSE', sector: 'Financial Services' },
-        { symbol: 'BTC', name: 'Bitcoin', exchange: 'Quidax', sector: 'Cryptocurrency' },
-        { symbol: 'ETH', name: 'Ethereum', exchange: 'Quidax', sector: 'Cryptocurrency' },
-        { symbol: 'BNB', name: 'Binance Coin', exchange: 'Quidax', sector: 'Cryptocurrency' },
-        { symbol: 'SOL', name: 'Solana', exchange: 'Quidax', sector: 'Cryptocurrency' },
-        { symbol: 'ADA', name: 'Cardano', exchange: 'Quidax', sector: 'Cryptocurrency' }
-      ]
+    const generateOrders = () => {
+      const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO']
+      const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT']
+      const allSymbols = [...nseSymbols, ...cryptoSymbols]
+      const exchanges = ['NSE', 'Quidax']
+      const orderTypes = ['market', 'limit']
+      const positions = ['buy', 'sell']
 
-      return symbols.map((item, index) => {
-        const basePrice = item.exchange === 'NSE' ?
-          (Math.random() * 500 + 50) :
-          (Math.random() * 50000 + 10000)
+      // Generate realistic trading session timestamp
+      const sessionStart = new Date()
+      sessionStart.setHours(9, 0, 0, 0) // Market opens at 9 AM
 
-        const quantity = Math.floor(Math.random() * 1000) + 100
-        const avgPrice = basePrice * (0.9 + Math.random() * 0.2)
-        const currentPrice = avgPrice * (0.8 + Math.random() * 0.4)
-        const pnl = (currentPrice - avgPrice) * quantity
-        const pnlPercent = ((currentPrice - avgPrice) / avgPrice) * 100
+      return Array.from({ length: 75 }, (_, index) => {
+        const symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)]
+        const isCrypto = cryptoSymbols.includes(symbol)
+        const exchange = isCrypto ? 'Quidax' : 'NSE'
+        const position = positions[Math.floor(Math.random() * positions.length)]
+        const orderType = orderTypes[Math.floor(Math.random() * orderTypes.length)]
+
+        // Realistic order amounts based on asset type
+        const baseAmount = isCrypto ?
+          Math.floor(Math.random() * 500000) + 50000 : // ₦50K - ₦550K for crypto
+          Math.floor(Math.random() * 2000000) + 100000 // ₦100K - ₦2.1M for stocks
+
+        const filledAmount = Math.floor(baseAmount * Math.random() * 0.6) // Conservative fills
+        const fraction = filledAmount / baseAmount
+
+        // Realistic entry times - mix of recent and older orders
+        const timeRange = Math.random() * 3600000 // Last hour
+        const entryTime = new Date(Date.now() - timeRange)
+        const fillTime = fraction >= 1 ? new Date(entryTime.getTime() + Math.random() * 300000) : null // Max 5 min fill
+        const timeSpent = fillTime ? Math.floor((fillTime - entryTime) / 1000) : Math.floor((Date.now() - entryTime) / 1000)
+
+        // Realistic latency ranges
+        const latency = isCrypto ?
+          Math.random() * 25 + 5 : // 5-30ms for crypto
+          Math.random() * 15 + 2   // 2-17ms for equities
+
+        // Generate realistic order ID
+        const timestamp = entryTime.getTime().toString().slice(-6)
+        const venue = exchange === 'NSE' ? 'NSE' : 'QDX'
+        const side = position === 'buy' ? 'B' : 'S'
+        const orderCounter = (index + 1).toString().padStart(4, '0')
+        const realisticId = `${venue}${side}${timestamp}${orderCounter}`
 
         return {
-          id: index + 1,
-          ...item,
-          quantity,
-          avgPrice,
-          currentPrice,
-          pnl,
-          pnlPercent,
-          value: currentPrice * quantity,
-          volume: Math.floor(Math.random() * 1000000) + 100000,
-          marketCap: Math.floor(Math.random() * 1000000000) + 100000000,
-          pe: (Math.random() * 30 + 10).toFixed(2),
-          dividend: item.exchange === 'NSE' ? (Math.random() * 5 + 1).toFixed(2) : 0,
-          beta: (Math.random() * 2 + 0.5).toFixed(2),
-          volatility: (Math.random() * 0.3 + 0.1).toFixed(3),
-          lastUpdate: new Date()
+          id: realisticId,
+          symbol,
+          position,
+          amount: baseAmount,
+          filledAmount,
+          fraction,
+          exchange,
+          orderType,
+          entryTime,
+          fillTime,
+          timeSpent,
+          latency,
+          status: fraction >= 1 ? 'filled' : fraction > 0 ? 'partial' : 'pending',
+          priority: Math.random() > 0.8 ? 'high' : 'normal',
+          venue: exchange,
+          orderSize: baseAmount,
+          avgFillPrice: isCrypto ?
+            (Math.random() * 100000 + 10000).toFixed(2) : // ₦10K-₦110K for crypto
+            (Math.random() * 500 + 50).toFixed(2), // ₦50-₦550 for stocks
+          lastFillTime: new Date(),
+          executionAlgo: Math.random() > 0.6 ? 'TWAP' : Math.random() > 0.3 ? 'VWAP' : 'POV'
         }
       })
     }
 
-    setLivePositions(generatePositions())
+    setOrders(generateOrders())
   }, [])
 
-  // Simulate real-time updates
+  // Ultra-fast HFT updates
   useEffect(() => {
     const interval = setInterval(() => {
+      const updateStart = performance.now()
       setIsUpdating(true)
 
-      setLivePositions(prev => prev.map(position => {
-        const volatility = parseFloat(position.volatility)
-        const priceChange = (Math.random() - 0.5) * volatility * position.currentPrice
-        const newPrice = Math.max(position.currentPrice + priceChange, 0.01)
-        const newPnL = (newPrice - position.avgPrice) * position.quantity
-        const newPnLPercent = ((newPrice - position.avgPrice) / position.avgPrice) * 100
+      setOrders(prevOrders => {
+        let updatedOrders = [...prevOrders]
 
-        return {
-          ...position,
-          currentPrice: newPrice,
-          pnl: newPnL,
-          pnlPercent: newPnLPercent,
-          value: newPrice * position.quantity,
-          volume: Math.max(position.volume + (Math.random() - 0.5) * 100000, 10000),
-          lastUpdate: new Date()
+        // Aggressive order lifecycle - HFT style with continuous recycling
+        updatedOrders = updatedOrders.filter(order => {
+          if (order.status === 'filled') {
+            return Math.random() > 0.4 // 40% chance to remove filled orders (faster turnover)
+          }
+          // Also remove very old orders to prevent accumulation
+          const orderAge = (Date.now() - order.entryTime.getTime()) / 1000
+          if (orderAge > 300) { // Remove orders older than 5 minutes
+            return Math.random() > 0.6 // 60% chance to remove old orders
+          }
+          return true
+        })
+
+        // Maintain optimal order count - force recycling when needed
+        if (updatedOrders.length > 85) {
+          // Aggressively remove older orders when approaching limit
+          updatedOrders = updatedOrders.slice(0, 60) // Keep only newest 60 orders
         }
-      }))
 
-      // Update portfolio metrics
-      setTimeout(() => {
-        const totalValue = livePositions.reduce((sum, pos) => sum + pos.value, 0)
-        const totalPnL = livePositions.reduce((sum, pos) => sum + pos.pnl, 0)
-        const totalPnLPercent = totalValue > 0 ? (totalPnL / (totalValue - totalPnL)) * 100 : 0
+        // Ultra-high frequency order injection with realistic data
+        const newOrderCount = Math.floor(Math.random() * 6) + 3 // 3-8 new orders per cycle
+        for (let i = 0; i < newOrderCount; i++) { // Remove length limit to ensure continuous flow
+          if (Math.random() > 0.3) { // 70% chance to add new order
+            const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO']
+            const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT']
+            const allSymbols = [...nseSymbols, ...cryptoSymbols]
 
-        setPortfolioMetrics(prev => ({
-          ...prev,
-          totalValue,
-          totalPnL,
-          totalPnLPercent,
-          volatility: (Math.random() * 0.2 + 0.1).toFixed(3),
-          sharpeRatio: (Math.random() * 2 + 0.5).toFixed(2),
-          maxDrawdown: (Math.random() * 0.15 + 0.05).toFixed(3),
-          beta: (Math.random() * 1.5 + 0.5).toFixed(2),
-          alpha: (Math.random() * 0.1 - 0.05).toFixed(3)
-        }))
-        setIsUpdating(false)
-      }, 500)
+            const symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)]
+            const isCrypto = cryptoSymbols.includes(symbol)
+            const exchange = isCrypto ? 'Quidax' : 'NSE'
+            const position = Math.random() > 0.5 ? 'buy' : 'sell'
+            const orderType = Math.random() > 0.7 ? 'limit' : 'market'
 
-    }, 2000)
+            // Realistic amounts
+            const amount = isCrypto ?
+              Math.floor(Math.random() * 1000000) + 100000 : // ₦100K - ₦1.1M for crypto
+              Math.floor(Math.random() * 5000000) + 200000   // ₦200K - ₦5.2M for stocks
+
+            const filledAmount = Math.floor(amount * Math.random() * 0.2) // Start mostly unfilled
+            const fraction = filledAmount / amount
+            // Generate entry time (0-2 minutes ago for new orders)
+            const entryTime = new Date(Date.now() - (Math.random() * 120000))
+
+            // Realistic latency
+            const latency = isCrypto ?
+              Math.random() * 30 + 8 : // 8-38ms for crypto
+              Math.random() * 20 + 3   // 3-23ms for equities
+
+            // Generate realistic order ID
+            const timestamp = entryTime.getTime().toString().slice(-6)
+            const venue = exchange === 'NSE' ? 'NSE' : 'QDX'
+            const side = position === 'buy' ? 'B' : 'S'
+            const orderCounter = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
+            const realisticId = `${venue}${side}${timestamp}${orderCounter}`
+
+            const newOrder = {
+              id: realisticId,
+              symbol,
+              position,
+              amount,
+              filledAmount,
+              fraction,
+              exchange,
+              orderType,
+              entryTime,
+              fillTime: null,
+              timeSpent: 0,
+              latency: latency,
+              status: filledAmount > 0 ? 'partial' : 'pending',
+              priority: Math.random() > 0.85 ? 'high' : 'normal',
+              venue: exchange,
+              orderSize: amount,
+              avgFillPrice: isCrypto ?
+                (Math.random() * 100000 + 10000).toFixed(2) : // ₦10K-₦110K for crypto
+                (Math.random() * 500 + 50).toFixed(2), // ₦50-₦550 for stocks
+              lastFillTime: new Date(),
+              executionAlgo: Math.random() > 0.6 ? 'TWAP' : Math.random() > 0.3 ? 'VWAP' : 'POV'
+            }
+
+            updatedOrders.unshift(newOrder) // Add to beginning
+          }
+        }
+
+        // Ensure minimum order count for continuous activity
+        if (updatedOrders.length < 20) {
+          // Force add orders if count gets too low
+          const emergencyOrderCount = 25 - updatedOrders.length
+          for (let i = 0; i < emergencyOrderCount; i++) {
+            const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO']
+            const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT']
+            const allSymbols = [...nseSymbols, ...cryptoSymbols]
+
+            const symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)]
+            const isCrypto = cryptoSymbols.includes(symbol)
+            const exchange = isCrypto ? 'Quidax' : 'NSE'
+            const position = Math.random() > 0.5 ? 'buy' : 'sell'
+            const orderType = Math.random() > 0.7 ? 'limit' : 'market'
+            const amount = isCrypto ?
+              Math.floor(Math.random() * 1000000) + 100000 :
+              Math.floor(Math.random() * 5000000) + 200000
+            const filledAmount = Math.floor(amount * Math.random() * 0.3)
+            const fraction = filledAmount / amount
+            // Generate realistic entry time (1-10 minutes ago for emergency orders)
+            const entryTime = new Date(Date.now() - (Math.random() * 600000 + 60000))
+            const latency = isCrypto ?
+              Math.random() * 30 + 8 :
+              Math.random() * 20 + 3
+
+            const timestamp = entryTime.getTime().toString().slice(-6)
+            const venue = exchange === 'NSE' ? 'NSE' : 'QDX'
+            const side = position === 'buy' ? 'B' : 'S'
+            const orderCounter = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
+            const realisticId = `${venue}${side}${timestamp}${orderCounter}`
+
+            const emergencyOrder = {
+              id: realisticId,
+              symbol, position, amount, filledAmount, fraction, exchange, orderType,
+              entryTime, fillTime: null, timeSpent: 0, latency,
+              status: filledAmount > 0 ? 'partial' : 'pending',
+              priority: Math.random() > 0.85 ? 'high' : 'normal',
+              venue: exchange, orderSize: amount,
+              avgFillPrice: isCrypto ?
+                (Math.random() * 100000 + 10000).toFixed(2) :
+                (Math.random() * 500 + 50).toFixed(2),
+              lastFillTime: new Date(),
+              executionAlgo: Math.random() > 0.6 ? 'TWAP' : Math.random() > 0.3 ? 'VWAP' : 'POV'
+            }
+
+            updatedOrders.unshift(emergencyOrder)
+          }
+        }
+
+        // Ultra-fast HFT order execution simulation
+        const newHighlighted = new Set()
+        const updatedOrdersWithHighlight = updatedOrders.map(order => {
+          // Aggressive HFT progression - orders fill very quickly
+          const fillSpeed = order.orderType === 'market' ? 0.8 : 0.4 // Market orders fill faster
+          const progressIncrement = Math.random() * fillSpeed
+          const newFilledAmount = Math.min(order.amount, order.filledAmount + (order.amount * progressIncrement))
+          const newFraction = newFilledAmount / order.amount
+          const currentTime = new Date()
+          const newTimeSpent = Math.max(0, Math.floor((currentTime - order.entryTime) / 1000))
+
+          // Ultra-low latency simulation (microseconds to milliseconds)
+          const newLatency = Math.random() * 15 + 0.05 // 0.05ms to 15ms
+
+          // Update market metrics
+          const buys = updatedOrders.filter(o => o.position === 'buy').length
+          const sells = updatedOrders.filter(o => o.position === 'sell').length
+          const totalVolume = updatedOrders.reduce((sum, o) => sum + o.filledAmount, 0)
+
+          setOrderFlow({ buys, sells, volume: totalVolume })
+          setMarketDepth({
+            bidCount: updatedOrders.filter(o => o.position === 'buy' && o.status !== 'filled').length,
+            askCount: updatedOrders.filter(o => o.position === 'sell' && o.status !== 'filled').length
+          })
+
+          let newFillTime = order.fillTime
+          let newStatus = order.status
+
+          // Rapid status changes for HFT
+          if (newFraction >= 1 && !order.fillTime) {
+            newFillTime = currentTime
+            newStatus = 'filled'
+          } else if (newFraction > 0.8) {
+            newStatus = 'partial'
+          } else if (newFraction > 0.2) {
+            newStatus = 'partial'
+          }
+
+          // Ultra-sensitive highlighting for constant activity
+          if (
+            Math.abs(newFilledAmount - order.filledAmount) > order.amount * 0.01 ||
+            Math.abs(newLatency - order.latency) > 3 ||
+            newStatus !== order.status ||
+            Math.random() > 0.85 // More frequent random highlighting for activity
+          ) {
+            newHighlighted.add(order.id)
+          }
+
+          return {
+            ...order,
+            filledAmount: newFilledAmount,
+            fraction: newFraction,
+            fillTime: newFillTime,
+            timeSpent: newTimeSpent,
+            latency: newLatency,
+            status: newStatus,
+            lastFillTime: newFilledAmount > order.filledAmount ? currentTime : order.lastFillTime,
+            avgFillPrice: (parseFloat(order.avgFillPrice) + (Math.random() - 0.5) * 10).toFixed(2)
+          }
+        })
+
+        setHighlightedRows(newHighlighted)
+
+        // Clear highlights after a very short delay for constant activity
+        setTimeout(() => {
+          setHighlightedRows(new Set())
+        }, 100)
+
+        return updatedOrdersWithHighlight
+      })
+
+      // Track system performance
+      const updateEnd = performance.now()
+      setSystemLatency(updateEnd - updateStart)
+
+      setTimeout(() => setIsUpdating(false), 50)
+    }, 50) // Blazing fast updates - every 50ms (20 FPS like real HFT)
 
     return () => clearInterval(interval)
-  }, [livePositions])
+  }, [])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-NG', {
@@ -128,320 +319,208 @@ const PortfolioSummary = () => {
     }).format(amount)
   }
 
-  const formatNumber = (num) => {
-    if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T'
-    if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B'
-    if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M'
-    if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K'
-    return num.toString()
+  const formatTime = (date) => {
+    return date ? date.toLocaleTimeString() : '-'
   }
 
-  const formatPercentage = (num) => {
-    return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`
+  const formatDuration = (seconds) => {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+
+    if (hours > 0) return `${hours}h ${minutes}m ${secs}s`
+    if (minutes > 0) return `${minutes}m ${secs}s`
+    return `${secs}s`
   }
 
-  const getPnLColor = (pnl) => {
-    if (pnl > 0) return 'text-green-600 dark:text-green-400'
-    if (pnl < 0) return 'text-red-600 dark:text-red-400'
-    return 'text-gray-600 dark:text-gray-400'
+  const formatLatency = (latency) => {
+    if (latency < 1) {
+      return `${(latency * 1000).toFixed(0)}μs` // Microseconds
+    } else if (latency < 1000) {
+      return `${latency.toFixed(2)}ms` // Milliseconds
+    } else {
+      return `${(latency / 1000).toFixed(2)}s` // Seconds
+    }
   }
 
-  const getPnLBackground = (pnl, isDark) => {
-    if (pnl > 0) return isDark ? 'bg-green-500/20' : 'bg-green-100'
-    if (pnl < 0) return isDark ? 'bg-red-500/20' : 'bg-red-100'
-    return isDark ? 'bg-gray-500/20' : 'bg-gray-100'
+  const formatVolume = (amount) => {
+    if (amount >= 1e9) return `${(amount / 1e9).toFixed(2)}B`
+    if (amount >= 1e6) return `${(amount / 1e6).toFixed(2)}M`
+    if (amount >= 1e3) return `${(amount / 1e3).toFixed(2)}K`
+    return amount.toFixed(0)
   }
 
-  const timeframes = ['1D', '1W', '1M', '3M', '1Y', 'ALL']
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'filled': return 'text-green-500'
+      case 'partial': return 'text-yellow-500'
+      case 'pending': return 'text-blue-500'
+      default: return 'text-gray-500'
+    }
+  }
+
+  const getPositionColor = (position) => {
+    return position === 'buy' ? 'text-green-500' : 'text-red-500'
+  }
 
   return (
-    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-2xl p-6 animated-border theme-transition`}>
-      {/* Header */}
-      <div className={`${isDarkMode ? 'bg-white/20' : 'bg-black/5'} rounded-xl p-4 mb-6 border ${isDarkMode ? 'border-white/20' : 'border-black/30'}`}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className={`text-xl font-bold font-ivy ${isDarkMode ? 'text-white' : 'text-black'} mb-2`}>Portfolio Summary</h2>
-            <p className="text-sm font-satoshi opacity-70">Real-time investment overview</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${isUpdating ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`}></div>
-            <span className="text-xs font-satoshi opacity-70">
-              {isUpdating ? 'Updating...' : 'Live'}
-            </span>
-          </div>
-        </div>
-
-        {/* Portfolio Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Total Value</p>
-            <p className={`text-lg font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-              {formatCurrency(portfolioMetrics.totalValue)}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Total P&L</p>
-            <p className={`text-lg font-bold font-satoshi ${getPnLColor(portfolioMetrics.totalPnL)}`}>
-              {formatCurrency(portfolioMetrics.totalPnL)}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">P&L %</p>
-            <p className={`text-lg font-bold font-satoshi ${getPnLColor(portfolioMetrics.totalPnLPercent)}`}>
-              {formatPercentage(portfolioMetrics.totalPnLPercent)}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Volatility</p>
-            <p className={`text-lg font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-              {(portfolioMetrics.volatility * 100).toFixed(1)}%
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Advanced Portfolio Metrics */}
-      <div className={`${isDarkMode ? 'bg-white/10' : 'bg-black/5'} rounded-xl p-4 mb-6 border ${isDarkMode ? 'border-white/20' : 'border-black/30'}`}>
-        <h3 className="text-lg font-semibold font-ivy mb-4">Quantitative Metrics</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Sharpe Ratio</p>
-            <p className={`text-sm font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-              {portfolioMetrics.sharpeRatio}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Max Drawdown</p>
-            <p className={`text-sm font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-              {(portfolioMetrics.maxDrawdown * 100).toFixed(1)}%
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Beta</p>
-            <p className={`text-sm font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-              {portfolioMetrics.beta}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Alpha</p>
-            <p className={`text-sm font-bold font-satoshi ${getPnLColor(portfolioMetrics.alpha * 100)}`}>
-              {(portfolioMetrics.alpha * 100).toFixed(2)}%
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs font-satoshi opacity-70 mb-1">Risk Level</p>
-            <p className={`text-sm font-bold font-satoshi ${portfolioMetrics.volatility < 0.15 ? 'text-green-600' :
-              portfolioMetrics.volatility < 0.25 ? 'text-yellow-600' : 'text-red-600'
-              }`}>
-              {portfolioMetrics.volatility < 0.15 ? 'Low' :
-                portfolioMetrics.volatility < 0.25 ? 'Medium' : 'High'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Timeframe Selector */}
+    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-2xl p-8 animated-border theme-transition`}>
+      {/* HFT Header with Real-time Metrics */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold font-ivy">Top Positions</h3>
-        <div className="flex space-x-2">
-          {timeframes.map((timeframe) => (
-            <button
-              key={timeframe}
-              onClick={() => setSelectedTimeframe(timeframe)}
-              className={`px-3 py-1 rounded-lg text-xs font-satoshi transition-all duration-200 ${selectedTimeframe === timeframe
-                ? isDarkMode
-                  ? 'bg-white text-black'
-                  : 'bg-black text-white'
-                : isDarkMode
-                  ? 'bg-white/10 text-white/70 hover:bg-white/20'
-                  : 'bg-black/5 text-black/70 hover:bg-black/10'
-                }`}
-            >
-              {timeframe}
-            </button>
-          ))}
+        <div>
+          <h2 className="text-2xl font-bold font-ivy mb-2">
+            HFT Order Management System
+            <span className={`ml-3 px-2 py-1 text-xs rounded ${isUpdating ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+              {isUpdating ? 'LIVE' : 'IDLE'}
+            </span>
+          </h2>
+          <p className="text-sm font-satoshi opacity-70">Ultra-low latency order execution • 100ms update cycle</p>
         </div>
-      </div>
-
-      {/* Dynamic Positions Table */}
-      <div className="mb-6">
-        <div className="overflow-x-auto">
-          <div className="min-w-full">
-            {/* Table Header */}
-            <div className={`${isDarkMode ? 'bg-white/10' : 'bg-black/10'} rounded-t-xl p-4 border-b ${isDarkMode ? 'border-white/20' : 'border-black/30'}`}>
-              <div className="grid grid-cols-12 gap-4 text-sm font-semibold font-satoshi">
-                <div className="col-span-2">Symbol & Exchange</div>
-                <div className="col-span-1 text-center">Quantity</div>
-                <div className="col-span-1 text-center">Avg Price</div>
-                <div className="col-span-1 text-center">Current</div>
-                <div className="col-span-1 text-center">Value</div>
-                <div className="col-span-2 text-center">P&L</div>
-                <div className="col-span-1 text-center">P/E</div>
-                <div className="col-span-1 text-center">Volume</div>
-                <div className="col-span-1 text-center">Risk</div>
-                <div className="col-span-1 text-center">Status</div>
-              </div>
-            </div>
-
-            {/* Table Body */}
-            <div className="space-y-2">
-              {livePositions.slice(0, 8).map((position) => (
-                <div
-                  key={position.id}
-                  className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 border ${isDarkMode ? 'border-white/10' : 'border-black/30'} transition-all duration-300 hover:shadow-lg`}
-                >
-                  <div className="grid grid-cols-12 gap-4 items-center">
-                    {/* Symbol & Exchange */}
-                    <div className="col-span-2">
-                      <div className="flex items-center space-x-3">
-                        <div className={`px-2 py-1 rounded text-xs font-medium font-satoshi ${position.exchange === 'NSE'
-                          ? isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-800'
-                          : isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-800'
-                          }`}>
-                          {position.exchange}
-                        </div>
-                        <div>
-                          <h4 className={`font-semibold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                            {position.symbol}
-                          </h4>
-                          <p className="text-xs opacity-70 font-satoshi">{position.name}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quantity */}
-                    <div className="col-span-1 text-center">
-                      <p className={`font-semibold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {position.quantity.toLocaleString()}
-                      </p>
-                    </div>
-
-                    {/* Avg Price */}
-                    <div className="col-span-1 text-center">
-                      <p className={`font-semibold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {formatCurrency(position.avgPrice)}
-                      </p>
-                    </div>
-
-                    {/* Current Price */}
-                    <div className="col-span-1 text-center">
-                      <p className={`font-semibold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {formatCurrency(position.currentPrice)}
-                      </p>
-                    </div>
-
-                    {/* Value */}
-                    <div className="col-span-1 text-center">
-                      <p className={`font-semibold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {formatCurrency(position.value)}
-                      </p>
-                    </div>
-
-                    {/* P&L */}
-                    <div className="col-span-2 text-center">
-                      <div className={`px-3 py-2 rounded-lg ${getPnLBackground(position.pnl, isDarkMode)}`}>
-                        <p className={`text-sm font-bold font-satoshi ${getPnLColor(position.pnl)}`}>
-                          {formatCurrency(position.pnl)}
-                        </p>
-                        <p className={`text-xs font-satoshi ${getPnLColor(position.pnl)}`}>
-                          {formatPercentage(position.pnlPercent)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* P/E Ratio */}
-                    <div className="col-span-1 text-center">
-                      <p className={`text-sm font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {position.pe}
-                      </p>
-                    </div>
-
-                    {/* Volume */}
-                    <div className="col-span-1 text-center">
-                      <p className={`text-sm font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {formatNumber(position.volume)}
-                      </p>
-                    </div>
-
-                    {/* Risk Level */}
-                    <div className="col-span-1 text-center">
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${position.volatility < 0.15 ? 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300' :
-                        position.volatility < 0.25 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300' :
-                          'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300'
-                        }`}>
-                        {(position.volatility * 100).toFixed(1)}%
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="col-span-1 text-center">
-                      <div className={`w-3 h-3 rounded-full mx-auto ${position.pnl > 0 ? 'bg-green-500' :
-                        position.pnl < 0 ? 'bg-red-500' : 'bg-gray-500'
-                        } animate-pulse`}></div>
-                    </div>
-                  </div>
-
-                  {/* Additional Info Row */}
-                  <div className="mt-3 pt-3 border-t border-opacity-20">
-                    <div className="grid grid-cols-6 gap-4 text-xs opacity-70 font-satoshi">
-                      <div className="text-center">
-                        <span className="font-medium">Sector:</span> {position.sector}
-                      </div>
-                      <div className="text-center">
-                        <span className="font-medium">Beta:</span> {position.beta}
-                      </div>
-                      <div className="text-center">
-                        <span className="font-medium">Market Cap:</span> {formatNumber(position.marketCap)}
-                      </div>
-                      {position.dividend > 0 && (
-                        <div className="text-center">
-                          <span className="font-medium">Dividend:</span> {position.dividend}%
-                        </div>
-                      )}
-                      <div className="text-center">
-                        <span className="font-medium">Last Update:</span> {position.lastUpdate.toLocaleTimeString()}
-                      </div>
-                      <div className="text-center">
-                        <span className="font-medium">Exchange:</span> {position.exchange}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`}>
+            <div className="text-xs font-satoshi opacity-70">Active Orders</div>
+            <div className="font-bold text-lg">{orders.filter(o => o.status !== 'filled').length}</div>
+          </div>
+          <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'}`}>
+            <div className="text-xs font-satoshi opacity-70">Buys/Sells</div>
+            <div className="font-bold text-lg text-blue-400">{orderFlow.buys}/{orderFlow.sells}</div>
+          </div>
+          <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-green-500/20' : 'bg-green-100'}`}>
+            <div className="text-xs font-satoshi opacity-70">System Latency</div>
+            <div className="font-bold text-lg text-green-400">{formatLatency(systemLatency)}</div>
+          </div>
+          <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'}`}>
+            <div className="text-xs font-satoshi opacity-70">Total Volume</div>
+            <div className="font-bold text-lg text-purple-400">₦{formatVolume(orderFlow.volume)}</div>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className={`${isDarkMode ? 'bg-white/10' : 'bg-black/5'} rounded-xl p-4 border ${isDarkMode ? 'border-white/20' : 'border-black/30'}`}>
-        <h3 className="text-lg font-semibold font-ivy mb-4">Quick Actions</h3>
-        <div className="flex flex-wrap gap-3">
-          <button className={`px-4 py-2 rounded-lg font-medium font-satoshi transition-all duration-200 ${isDarkMode
-            ? 'bg-white/20 hover:bg-white/30 text-white'
-            : 'bg-black/10 hover:bg-black/20 text-black'
-            }`}>
-            Add Position
-          </button>
-          <button className={`px-4 py-2 rounded-lg font-medium font-satoshi transition-all duration-200 ${isDarkMode
-            ? 'bg-white/20 hover:bg-white/30 text-white'
-            : 'bg-black/10 hover:bg-black/20 text-black'
-            }`}>
-            Rebalance
-          </button>
-          <button className={`px-4 py-2 rounded-lg font-medium font-satoshi transition-all duration-200 ${isDarkMode
-            ? 'bg-white/20 hover:bg-white/30 text-white'
-            : 'bg-black/10 hover:bg-black/20 text-black'
-            }`}>
-            Export Data
-          </button>
-          <button className={`px-4 py-2 rounded-lg font-medium font-satoshi transition-all duration-200 ${isDarkMode
-            ? 'bg-white/20 hover:bg-white/30 text-white'
-            : 'bg-black/10 hover:bg-black/20 text-black'
-            }`}>
-            Risk Analysis
-          </button>
+      {/* Summary Statistics */}
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
+          <h3 className="text-sm font-satoshi opacity-70 mb-1">Total Orders</h3>
+          <p className="text-2xl font-bold font-satoshi">{orders.length}</p>
         </div>
+        <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
+          <h3 className="text-sm font-satoshi opacity-70 mb-1">Filled Orders</h3>
+          <p className="text-2xl font-bold font-satoshi text-green-500">{orders.filter(o => o.status === 'filled').length}</p>
+        </div>
+        <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
+          <h3 className="text-sm font-satoshi opacity-70 mb-1">Avg. Fill Rate</h3>
+          <p className="text-2xl font-bold font-satoshi">
+            {((orders.reduce((sum, o) => sum + o.fraction, 0) / orders.length) * 100).toFixed(1)}%
+          </p>
+        </div>
+        <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
+          <h3 className="text-sm font-satoshi opacity-70 mb-1">Avg. Latency</h3>
+          <p className="text-2xl font-bold font-satoshi">
+            {Math.round(orders.reduce((sum, o) => sum + o.latency, 0) / orders.length)}ms
+          </p>
+        </div>
+      </div>
+
+      {/* Orders Table */}
+      <div className="overflow-x-auto border rounded-lg">
+        <table className="w-full">
+          <thead className={`${isDarkMode ? 'bg-black/90' : 'bg-white/90'} backdrop-blur-sm`}>
+            <tr className={`border-b ${isDarkMode ? 'border-white/20' : 'border-black/20'}`}>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Position</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Amount</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Filled Amount</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Fraction</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Exchange</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Order Type</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">ID</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Entry Time</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Fill Time</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Time Spent</th>
+              <th className="text-left py-4 px-3 font-satoshi font-semibold opacity-80">Latency</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order, index) => {
+              const isHighlighted = highlightedRows.has(order.id)
+              const isNewOrder = index < 3 // Highlight first 3 rows as "new"
+
+              return (
+                <tr
+                  key={order.id}
+                  className={`border-b ${isDarkMode ? 'border-white/10' : 'border-black/10'} 
+                    hover:${isDarkMode ? 'bg-white/5' : 'bg-black/5'} 
+                    transition-all duration-300
+                    ${isHighlighted ?
+                      (isDarkMode ? 'bg-blue-500/20 shadow-lg shadow-blue-500/20' : 'bg-blue-200/50 shadow-lg shadow-blue-200/50')
+                      : ''
+                    }
+                    ${isNewOrder ?
+                      (isDarkMode ? 'bg-green-500/10 animate-pulse' : 'bg-green-100/50 animate-pulse')
+                      : ''
+                    }
+                  `}
+                >
+                  <td className="py-4 px-3">
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2 py-1 rounded text-xs font-bold ${getPositionColor(order.position)}`}>
+                        {order.position.toUpperCase()}
+                      </span>
+                      <span className="font-satoshi font-medium">{order.symbol}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-3 font-satoshi font-medium">
+                    {formatCurrency(order.amount)}
+                  </td>
+                  <td className="py-4 px-3">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-satoshi font-medium">{formatCurrency(order.filledAmount)}</span>
+                      <span className={`text-xs px-2 py-1 rounded ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-3">
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-16 h-2 rounded-full ${isDarkMode ? 'bg-white/20' : 'bg-black/20'}`}>
+                        <div
+                          className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-500"
+                          style={{ width: `${order.fraction * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="font-satoshi text-sm">{(order.fraction * 100).toFixed(1)}%</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-3">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${order.exchange === 'NSE' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                      {order.exchange}
+                    </span>
+                  </td>
+                  <td className="py-4 px-3">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${order.orderType === 'market' ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                      {order.orderType}
+                    </span>
+                  </td>
+                  <td className="py-4 px-3 font-mono text-sm opacity-80">
+                    {order.id}
+                  </td>
+                  <td className="py-4 px-3 font-satoshi text-sm">
+                    {formatTime(order.entryTime)}
+                  </td>
+                  <td className="py-4 px-3 font-satoshi text-sm">
+                    {formatTime(order.fillTime)}
+                  </td>
+                  <td className="py-4 px-3 font-mono text-sm">
+                    {formatDuration(order.timeSpent)}
+                  </td>
+                  <td className="py-4 px-3">
+                    <span className={`font-mono text-sm ${order.latency < 1 ? 'text-green-500' : order.latency < 10 ? 'text-yellow-500' : 'text-red-500'}`}>
+                      {formatLatency(order.latency)}
+                    </span>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )

@@ -31,9 +31,9 @@ export const DashboardProvider = ({ children }) => {
   ])
 
   const [portfolio, setPortfolio] = useState({
-    totalValue: 25000000,
-    dailyChange: 1250000,
-    dailyChangePercent: 5.25,
+    totalValue: 2546720,
+    dailyChange: 127340,
+    dailyChangePercent: 5.26,
     positions: [
       { symbol: 'MTN', quantity: 1000, avgPrice: 150, currentPrice: 165, change: 10.0 },
       { symbol: 'DANGOTE', quantity: 500, avgPrice: 200, currentPrice: 195, change: -2.5 },
@@ -62,7 +62,7 @@ export const DashboardProvider = ({ children }) => {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
         label: 'Portfolio Value',
-        data: [20000000, 21500000, 19800000, 22500000, 23500000, 25000000],
+        data: [2040000, 2185000, 1968000, 2297000, 2418000, 2546720],
         borderColor: '#ffffff',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         tension: 0.4
@@ -80,17 +80,39 @@ export const DashboardProvider = ({ children }) => {
     }
   })
 
-  // Simulate real-time data updates
+  // Ultra-fast real-time data updates - continuous streams
   useEffect(() => {
-    const interval = setInterval(() => {
+    const portfolioInterval = setInterval(() => {
       setPortfolio(prev => ({
         ...prev,
-        totalValue: prev.totalValue + (Math.random() - 0.5) * 100000,
-        dailyChange: prev.dailyChange + (Math.random() - 0.5) * 50000
+        totalValue: prev.totalValue + (Math.random() - 0.5) * 50000,
+        dailyChange: prev.dailyChange + (Math.random() - 0.5) * 25000,
+        dailyChangePercent: prev.dailyChangePercent + (Math.random() - 0.5) * 0.5
       }))
-    }, 5000)
+    }, 1000) // Update every second
 
-    return () => clearInterval(interval)
+    const marketInterval = setInterval(() => {
+      setMarketData(prev => ({
+        nse: {
+          ...prev.nse,
+          allShareIndex: prev.nse.allShareIndex + (Math.random() - 0.5) * 50,
+          volume: prev.nse.volume + Math.floor(Math.random() * 5000000),
+          marketCap: prev.nse.marketCap + (Math.random() - 0.5) * 100000000000
+        },
+        quidax: {
+          ...prev.quidax,
+          btcPrice: prev.quidax.btcPrice + (Math.random() - 0.5) * 500000,
+          ethPrice: prev.quidax.ethPrice + (Math.random() - 0.5) * 50000,
+          volume: prev.quidax.volume + Math.floor(Math.random() * 2000000),
+          marketCap: prev.quidax.marketCap + (Math.random() - 0.5) * 50000000000
+        }
+      }))
+    }, 1500) // Market data every 1.5 seconds
+
+    return () => {
+      clearInterval(portfolioInterval)
+      clearInterval(marketInterval)
+    }
   }, [])
 
   const value = {

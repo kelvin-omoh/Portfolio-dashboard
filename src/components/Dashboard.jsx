@@ -17,33 +17,34 @@ const Dashboard = () => {
       <main className="container mx-auto px-6 py-8">
         {/* Portfolio Summary - Full Width Section */}
         <div className="mb-8">
+          <ExchangeOverview />
+        </div>
+        <div className="mb-8">
           <PortfolioSummary />
         </div>
 
         {/* Portfolio Performance - Full Width Section */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <PortfolioChart />
-        </div>
+        </div> */}
 
         {/* Exchange Overview - Full Width Section */}
-        <div className="mb-8">
-          <ExchangeOverview />
-        </div>
+
 
         {/* Positions Table - Full Width Section */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <PositionsTable />
-        </div>
+        </div> */}
 
         {/* ROI Chart - Full Width Section */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <ROIChart />
-        </div>
+        </div> */}
 
         {/* Market Ticker - Full Width Section */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <MarketTicker />
-        </div>
+        </div> */}
       </main>
     </div>
   )
