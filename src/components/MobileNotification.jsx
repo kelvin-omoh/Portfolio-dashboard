@@ -51,7 +51,7 @@ const MobileNotification = () => {
               📱 Mobile Device Detected
             </h3>
             <p className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-200' : 'text-amber-700'} leading-relaxed`}>
-              <strong>Ricardian Trading Platform</strong> is optimized for desktop/laptop computers with larger screens. 
+              <strong>RicardianCorp Trading Platform</strong> is optimized for desktop/laptop computers with larger screens. 
               For the best trading experience with full functionality, charts, and real-time data visualization, 
               please access this platform on your <strong>PC or laptop</strong>.
             </p>
@@ -88,11 +88,11 @@ const MobileNotification = () => {
           <div className="flex items-center justify-between text-xs">
             <div className={`font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-700'} flex items-center space-x-1`}>
               <span>🏢</span>
-              <span>Ricardian Corp Professional Trading Platform</span>
+              <span>RicardianCorp Professional Trading Platform</span>
             </div>
             <div className={`font-satoshi ${isDarkMode ? 'text-amber-400' : 'text-amber-600'} flex items-center space-x-1`}>
               <span>📞</span>
-              <span>enterprise@ricardian.com</span>
+              <span>enterprise@ricardiancorp.com</span>
             </div>
           </div>
         </div>

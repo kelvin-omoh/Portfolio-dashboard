@@ -95,9 +95,8 @@ const Header = () => {
               <span className="font-bold text-2xl font-ivy">R</span>
             </div>
             <div>
-              <h1 className={`text-3xl font-bold font-ivy ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                Ricardian Trading
-                <span className="text-lg font-medium text-blue-500 ml-2">by Ricardian Corp</span>
+              <h1 className={`text-3xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                RicardianCorp
               </h1>
               <p className="text-sm font-satoshi opacity-70 mt-1">Professional HFT Platform • NSE & Crypto Markets • Ultra-Low Latency</p>
             </div>
