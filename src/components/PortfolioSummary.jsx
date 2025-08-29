@@ -364,19 +364,21 @@ const PortfolioSummary = () => {
   }
 
   return (
-    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-2xl p-8 animated-border theme-transition`}>
+    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-xl md:rounded-2xl p-4 md:p-8 animated-border theme-transition`}>
       {/* HFT Header with Real-time Metrics */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 space-y-3 md:space-y-0">
         <div>
-          <h2 className="text-2xl font-bold font-ivy mb-2">
-            HFT Order Management System
-            <span className={`ml-3 px-2 py-1 text-xs rounded ${isUpdating ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+          <h2 className="text-xl md:text-2xl font-bold font-ivy mb-1 md:mb-2">
+            <span className="hidden sm:inline">HFT Order Management System</span>
+            <span className="sm:hidden">HFT Orders</span>
+            <span className={`ml-2 md:ml-3 px-2 py-1 text-xs rounded ${isUpdating ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
               {isUpdating ? 'LIVE' : 'IDLE'}
             </span>
           </h2>
-          <p className="text-sm font-satoshi opacity-70">Ultra-low latency order execution • 100ms update cycle</p>
+          <p className="text-xs md:text-sm font-satoshi opacity-70 hidden sm:block">Ultra-low latency order execution • 100ms update cycle</p>
+          <p className="text-xs font-satoshi opacity-70 sm:hidden">Real-time order execution</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
           <div className={`px-3 py-2 rounded-lg text-center ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`}>
             <div className="text-xs font-satoshi opacity-70">Active Orders</div>
             <div className="font-bold text-lg">{orders.filter(o => o.status !== 'filled').length}</div>
@@ -397,7 +399,7 @@ const PortfolioSummary = () => {
       </div>
 
       {/* Summary Statistics */}
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
         <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
           <h3 className="text-sm font-satoshi opacity-70 mb-1">Total Orders</h3>
           <p className="text-2xl font-bold font-satoshi">{orders.length}</p>
@@ -420,8 +422,9 @@ const PortfolioSummary = () => {
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="overflow-x-auto border rounded-lg">
+      {/* Orders Display - Responsive */}
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto border rounded-lg">
         <table className="w-full">
           <thead className={`${isDarkMode ? 'bg-black/90' : 'bg-white/90'} backdrop-blur-sm`}>
             <tr className={`border-b ${isDarkMode ? 'border-white/20' : 'border-black/20'}`}>
@@ -521,6 +524,106 @@ const PortfolioSummary = () => {
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-3">
+        {orders.slice(0, 15).map((order, index) => {
+          const isHighlighted = highlightedRows.has(order.id)
+          const isNewOrder = index < 3
+
+          return (
+            <div
+              key={order.id}
+              className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} 
+                border rounded-xl p-4 transition-all duration-300
+                ${isHighlighted ? 'bg-blue-500/20 border-blue-500/30 shadow-lg' : ''} 
+                ${isNewOrder ? 'bg-green-500/10 border-green-500/30 animate-pulse' : ''}`}
+            >
+              {/* Order Header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getPositionColor(order.position)}`}>
+                    {order.position.toUpperCase()}
+                  </span>
+                  <span className="font-satoshi font-semibold text-sm">{order.symbol}</span>
+                </div>
+                <div className="text-right">
+                  <div className={`text-sm font-bold ${order.latency < 1 ? 'text-green-500' : order.latency < 10 ? 'text-yellow-500' : 'text-red-500'}`}>
+                    {formatLatency(order.latency)}
+                  </div>
+                  <div className="text-xs opacity-50 font-mono">#{order.id.slice(-6)}</div>
+                </div>
+              </div>
+
+              {/* Exchange and Order Type */}
+              <div className="flex items-center space-x-2 mb-3">
+                <span className={`px-2 py-1 rounded text-xs font-medium ${order.exchange === 'NSE' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                  {order.exchange}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${order.orderType === 'market' ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                  {order.orderType}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs ${getStatusColor(order.status)}`}>
+                  {order.status}
+                </span>
+              </div>
+
+              {/* Amount Information */}
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div>
+                  <div className="text-xs opacity-70 font-satoshi mb-1">Total Amount</div>
+                  <div className="font-bold font-satoshi">{formatCurrency(order.amount)}</div>
+                </div>
+                <div>
+                  <div className="text-xs opacity-70 font-satoshi mb-1">Filled Amount</div>
+                  <div className="font-bold font-satoshi text-green-400">{formatCurrency(order.filledAmount)}</div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs opacity-70 font-satoshi">Fill Progress</span>
+                  <span className="text-sm font-bold text-blue-400">
+                    {(order.fraction * 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div className={`w-full h-3 rounded-full ${isDarkMode ? 'bg-white/20' : 'bg-black/20'} overflow-hidden`}>
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-500 rounded-full"
+                    style={{ width: `${order.fraction * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Time Information */}
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <div className="opacity-70 mb-1">Entry Time</div>
+                  <div className="font-mono text-sm">{formatTime(order.entryTime)}</div>
+                </div>
+                <div>
+                  <div className="opacity-70 mb-1">Duration</div>
+                  <div className="font-mono text-sm">{formatDuration(order.timeSpent)}</div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+        
+        {/* Show More Orders Indicator */}
+        {orders.length > 15 && (
+          <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} 
+            border rounded-xl p-4 text-center`}>
+            <div className="text-sm font-satoshi opacity-70">
+              Showing 15 of {orders.length} active orders
+            </div>
+            <div className="text-xs opacity-50 mt-1">
+              Full table view available on desktop
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
