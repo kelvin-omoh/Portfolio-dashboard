@@ -35,32 +35,60 @@ const MobileNotification = () => {
   if (!isMobile || !isVisible) return null
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 ${isDarkMode ? 'bg-red-900/95' : 'bg-red-100/95'} backdrop-blur-sm border-b ${isDarkMode ? 'border-red-700' : 'border-red-300'}`}>
-      <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-center space-x-3">
-          {/* Warning Icon */}
-          <div className={`w-5 h-5 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-lg">
+      <div className="text-center px-8 py-12 max-w-md mx-auto">
+        {/* RicardianCorp Logo */}
+        <div className="mb-8">
+          <div className="w-20 h-20 mx-auto rounded-2xl bg-white text-black shadow-2xl flex items-center justify-center mb-4">
+            <span className="font-bold text-4xl font-ivy">R</span>
           </div>
-
-          {/* Simple Warning Message */}
-          <div className={`font-bold font-satoshi ${isDarkMode ? 'text-red-300' : 'text-red-800'} text-sm`}>
-            ⚠️ VIEW ONLY ON PC - This platform requires desktop/laptop computer
-          </div>
-
-          {/* Dismiss Button */}
-          <button
-            onClick={handleDismiss}
-            className={`w-5 h-5 rounded-full ${isDarkMode ? 'text-red-400 hover:bg-red-800/50' : 'text-red-600 hover:bg-red-200/50'} transition-colors duration-200 flex items-center justify-center`}
-            title="Dismiss warning"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <h1 className="text-2xl font-bold font-satoshi text-white mb-2">
+            RicardianCorp
+          </h1>
+          <p className="text-sm font-satoshi text-gray-300">
+            Professional Trading Platform
+          </p>
         </div>
+
+        {/* Warning Icon */}
+        <div className="w-16 h-16 mx-auto mb-6 text-red-400">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+
+        {/* Warning Message */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold font-satoshi text-red-400 mb-4">
+            ⚠️ PC REQUIRED
+          </h2>
+          <p className="text-white font-satoshi text-lg leading-relaxed mb-4">
+            Please view this platform on your <strong className="text-red-400">PC or laptop computer</strong>
+          </p>
+          <p className="text-gray-300 font-satoshi text-sm">
+            This professional trading platform requires a desktop environment for optimal performance
+          </p>
+        </div>
+
+        {/* Action Instructions */}
+        <div className="space-y-3 mb-8">
+          <div className="flex items-center justify-center space-x-2 text-gray-300">
+            <span>💻</span>
+            <span className="font-satoshi text-sm">Open on Desktop/Laptop</span>
+          </div>
+          <div className="flex items-center justify-center space-x-2 text-gray-300">
+            <span>🔗</span>
+            <span className="font-satoshi text-sm">Same URL on PC Browser</span>
+          </div>
+        </div>
+
+        {/* Dismiss Button */}
+        <button
+          onClick={handleDismiss}
+          className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-satoshi font-medium rounded-lg transition-colors duration-200"
+        >
+          Continue Anyway
+        </button>
       </div>
     </div>
   )
