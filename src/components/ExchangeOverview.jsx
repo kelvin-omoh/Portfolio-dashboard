@@ -341,7 +341,7 @@ const ExchangeOverview = ({ exchanges }) => {
                   <h3 className="text-lg font-bold font-satoshi">NSE Market Data</h3>
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-xs opacity-70 font-satoshi mb-1">All-Share Index</div>
@@ -386,7 +386,7 @@ const ExchangeOverview = ({ exchanges }) => {
                   <h3 className="text-lg font-bold font-satoshi">Quidax Crypto</h3>
                   <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-xs opacity-70 font-satoshi mb-1">Bitcoin Price</div>
