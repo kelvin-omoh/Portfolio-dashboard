@@ -35,7 +35,7 @@ const MobileNotification = () => {
   if (!isMobile || !isVisible) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-lg">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-lg">
       <div className="text-center px-8 py-12 max-w-md mx-auto">
         {/* RicardianCorp Logo */}
         <div className="mb-8">
