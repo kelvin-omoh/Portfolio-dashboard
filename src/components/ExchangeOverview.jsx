@@ -214,119 +214,215 @@ const ExchangeOverview = ({ exchanges }) => {
         })}
       </div>
 
-      {/* Exchange Content */}
+      {/* Exchange Content - Responsive */}
       <div className="space-y-6">
-        {activeTab === 'NSE' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+        {/* Desktop View */}
+        <div className="hidden md:block">
+          {activeTab === 'NSE' && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Market Cap</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  ₦{formatNumber(getNseData().marketCap)}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">Total Value</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Market Cap</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                ₦{formatNumber(getNseData().marketCap)}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">Total Value</p>
-            </div>
 
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Volume</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  ₦{formatNumber(getNseData().volume)}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">24h Trading</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Volume</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                ₦{formatNumber(getNseData().volume)}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">24h Trading</p>
-            </div>
 
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Active Stocks</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  {getNseData().activeStocks}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">Trading Today</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Active Stocks</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                {getNseData().activeStocks}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">Trading Today</p>
-            </div>
 
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                </svg>
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Index</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  {getNseData().index.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">NGX All-Share</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Index</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                {getNseData().index.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">NGX All-Share</p>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'Quidax' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+          {activeTab === 'Quidax' && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Market Cap</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  ₦{formatNumber(getQuidaxData().marketCap)}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">Total Value</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Market Cap</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                ₦{formatNumber(getQuidaxData().marketCap)}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">Total Value</p>
-            </div>
 
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Volume</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  ₦{formatNumber(getQuidaxData().volume)}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">24h Trading</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Volume</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                ₦{formatNumber(getQuidaxData().volume)}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">24h Trading</p>
-            </div>
 
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">Active Pairs</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  {getQuidaxData().activePairs}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">Trading Today</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">Active Pairs</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                {getQuidaxData().activePairs}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">Trading Today</p>
-            </div>
 
-            <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white' : 'text-black'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold font-satoshi mb-2">BTC Price</h3>
+                <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  ₦{formatNumber(getQuidaxData().btcPrice)}
+                </p>
+                <p className="text-sm opacity-70 font-satoshi mt-1">Bitcoin</p>
               </div>
-              <h3 className="text-lg font-semibold font-satoshi mb-2">BTC Price</h3>
-              <p className={`text-2xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                ₦{formatNumber(getQuidaxData().btcPrice)}
-              </p>
-              <p className="text-sm opacity-70 font-satoshi mt-1">Bitcoin</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Mobile View - Simplified Cards */}
+        <div className="md:hidden">
+          {activeTab === 'NSE' && (
+            <div className="space-y-4">
+              {/* Primary Market Data Card */}
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-4 border`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold font-satoshi">NSE Market Data</h3>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">All-Share Index</div>
+                    <div className={`text-xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                      {getNseData().index.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Market Cap</div>
+                    <div className={`text-xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                      ₦{formatNumber(getNseData().marketCap)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Secondary Data Card */}
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-4 border`}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Volume (24h)</div>
+                    <div className={`text-lg font-bold font-satoshi ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                      ₦{formatNumber(getNseData().volume)}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Active Stocks</div>
+                    <div className={`text-lg font-bold font-satoshi ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                      {getNseData().activeStocks}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'Quidax' && (
+            <div className="space-y-4">
+              {/* Primary Crypto Data Card */}
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-4 border`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold font-satoshi">Quidax Crypto</h3>
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Bitcoin Price</div>
+                    <div className={`text-xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                      ₦{formatNumber(getQuidaxData().btcPrice)}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Market Cap</div>
+                    <div className={`text-xl font-bold font-satoshi ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                      ₦{formatNumber(getQuidaxData().marketCap)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Secondary Data Card */}
+              <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-4 border`}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Volume (24h)</div>
+                    <div className={`text-lg font-bold font-satoshi ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                      ₦{formatNumber(getQuidaxData().volume)}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs opacity-70 font-satoshi mb-1">Active Pairs</div>
+                    <div className={`text-lg font-bold font-satoshi ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                      {getQuidaxData().activePairs}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Exchange Status Footer */}

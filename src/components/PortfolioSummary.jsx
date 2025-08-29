@@ -590,7 +590,7 @@ const PortfolioSummary = () => {
                   </span>
                 </div>
                 <div className={`w-full h-3 rounded-full ${isDarkMode ? 'bg-white/20' : 'bg-black/20'} overflow-hidden`}>
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-500 rounded-full"
                     style={{ width: `${order.fraction * 100}%` }}
                   ></div>
@@ -611,7 +611,7 @@ const PortfolioSummary = () => {
             </div>
           )
         })}
-        
+
         {/* Show More Orders Indicator */}
         {orders.length > 15 && (
           <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} 
