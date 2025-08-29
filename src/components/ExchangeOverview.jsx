@@ -98,15 +98,16 @@ const ExchangeOverview = ({ exchanges }) => {
   }
 
   return (
-    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-2xl p-8 animated-border theme-transition`}>
+    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-xl md:rounded-2xl p-4 md:p-8 animated-border theme-transition`}>
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold font-ivy mb-2">Exchange Overview</h2>
-            <p className="text-sm font-satoshi opacity-70">Live market data • NSE equities & crypto trading • Sub-30ms latency</p>
+            <h2 className="text-xl md:text-2xl font-bold font-ivy mb-1 md:mb-2">Exchange Overview</h2>
+            <p className="text-xs md:text-sm font-satoshi opacity-70 hidden sm:block">Live market data • NSE equities & crypto trading • Sub-30ms latency</p>
+            <p className="text-xs font-satoshi opacity-70 sm:hidden">Live market data</p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="hidden sm:flex items-center space-x-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-satoshi opacity-60">Click to switch exchanges</span>
           </div>
@@ -114,7 +115,7 @@ const ExchangeOverview = ({ exchanges }) => {
       </div>
 
       {/* Dynamic Tab Navigation */}
-      <div className="flex space-x-3 mb-8">
+      <div className="flex space-x-2 md:space-x-3 mb-6 md:mb-8">
         {['NSE', 'Quidax'].map((exchange) => {
           const status = exchangeStatus[exchange]
           const isActive = activeTab === exchange
@@ -124,7 +125,7 @@ const ExchangeOverview = ({ exchanges }) => {
             <button
               key={exchange}
               onClick={() => setActiveTab(exchange)}
-              className={`group relative flex-1 px-6 py-4 rounded-xl font-medium font-satoshi transition-all duration-300 transform hover:scale-[1.02] cursor-pointer ${isActive
+              className={`group relative flex-1 px-3 md:px-6 py-3 md:py-4 rounded-lg md:rounded-xl font-medium font-satoshi transition-all duration-300 transform hover:scale-[1.02] cursor-pointer ${isActive
                 ? isDarkMode
                   ? 'bg-slate-800/80 text-white shadow-xl border-2 border-blue-500/50 backdrop-blur-sm'
                   : 'bg-slate-100/90 text-slate-800 shadow-xl border-2 border-blue-500/60 backdrop-blur-sm'
@@ -136,7 +137,7 @@ const ExchangeOverview = ({ exchanges }) => {
             >
               {/* Exchange Header */}
               <div className="flex items-center justify-between mb-2">
-                <span className="text-lg font-semibold">{exchange}</span>
+                <span className="text-base md:text-lg font-semibold">{exchange}</span>
                 <div className="flex items-center space-x-2">
                   <div className={`flex items-center space-x-1 ${getStatusColor(status.status)}`}>
                     {getStatusIcon(status.status)}

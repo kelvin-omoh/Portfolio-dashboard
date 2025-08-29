@@ -21,12 +21,12 @@ const MobileNotification = () => {
 
   const handleDismiss = () => {
     setIsVisible(false)
-    // Remember user dismissed for this session
-    sessionStorage.setItem('mobile-notification-dismissed', 'true')
+    // Remember user dismissed permanently
+    localStorage.setItem('mobile-notification-dismissed', 'true')
   }
 
   useEffect(() => {
-    const dismissed = sessionStorage.getItem('mobile-notification-dismissed')
+    const dismissed = localStorage.getItem('mobile-notification-dismissed')
     if (dismissed) {
       setIsVisible(false)
     }

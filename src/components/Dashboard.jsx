@@ -14,12 +14,12 @@ const Dashboard = () => {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-black text-white' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'} theme-transition`}>
       <Header />
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 md:px-6 py-4 md:py-8">
         {/* Portfolio Summary - Full Width Section */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <ExchangeOverview />
         </div>
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <PortfolioSummary />
         </div>
 
