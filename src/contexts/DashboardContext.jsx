@@ -36,7 +36,7 @@ export const DashboardProvider = ({ children }) => {
     dailyChangePercent: 5.26,
     positions: [
       { symbol: 'MTN', quantity: 1000, avgPrice: 150, currentPrice: 165, change: 10.0 },
-      { symbol: 'DANGOTE', quantity: 500, avgPrice: 200, currentPrice: 195, change: -2.5 },
+      { symbol: 'DANGOTE', quantity: 500, avgPrice: 200, currentPrice: 212, change: 6.0 },
       { symbol: 'ZENITH', quantity: 800, avgPrice: 25, currentPrice: 28, change: 12.0 }
     ]
   })
@@ -62,7 +62,7 @@ export const DashboardProvider = ({ children }) => {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
         label: 'Portfolio Value',
-        data: [2040000, 2185000, 1968000, 2297000, 2418000, 2546720],
+        data: [2040000, 2185000, 2245000, 2397000, 2418000, 2546720],
         borderColor: '#ffffff',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         tension: 0.4
@@ -72,7 +72,7 @@ export const DashboardProvider = ({ children }) => {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
         label: 'ROI %',
-        data: [0, 7.5, -1.0, 13.6, 4.4, 6.4],
+        data: [0, 7.1, 2.7, 6.8, 0.9, 5.3],
         borderColor: '#00ff00',
         backgroundColor: 'rgba(0, 255, 0, 0.1)',
         tension: 0.4
@@ -83,12 +83,27 @@ export const DashboardProvider = ({ children }) => {
   // Ultra-fast real-time data updates - continuous streams
   useEffect(() => {
     const portfolioInterval = setInterval(() => {
-      setPortfolio(prev => ({
-        ...prev,
-        totalValue: prev.totalValue + (Math.random() - 0.5) * 50000,
-        dailyChange: prev.dailyChange + (Math.random() - 0.5) * 25000,
-        dailyChangePercent: prev.dailyChangePercent + (Math.random() - 0.5) * 0.5
-      }))
+      setPortfolio(prev => {
+        // Always profitable - slight upward bias with occasional small dips
+        const valueChange = Math.random() > 0.8 
+          ? -(Math.random() * 15000) // Small dip 20% of the time
+          : Math.random() * 35000    // Growth 80% of the time
+        
+        const changeVariation = Math.random() > 0.8 
+          ? -(Math.random() * 8000)  // Small negative change 20% of the time
+          : Math.random() * 18000    // Positive change 80% of the time
+        
+        const newDailyChange = Math.max(prev.dailyChange + changeVariation, 50000) // Never go below 50k daily profit
+        const newTotalValue = Math.max(prev.totalValue + valueChange, 2400000) // Never go below 2.4M
+        const newChangePercent = (newDailyChange / newTotalValue) * 100
+        
+        return {
+          ...prev,
+          totalValue: newTotalValue,
+          dailyChange: newDailyChange,
+          dailyChangePercent: Math.max(newChangePercent, 1.8) // Always at least 1.8% positive
+        }
+      })
     }, 1000) // Update every second
 
     const marketInterval = setInterval(() => {
