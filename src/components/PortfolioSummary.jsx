@@ -526,11 +526,41 @@ const PortfolioSummary = () => {
         </table>
       </div>
 
-      {/* Mobile Card View */}
+      {/* Mobile Card View - Fixed 15 slots to prevent dancing */}
       <div className="lg:hidden space-y-3">
-        {orders.slice(0, 15).map((order, index) => {
-          const isHighlighted = highlightedRows.has(order.id)
-          const isNewOrder = index < 3
+        {Array.from({ length: 15 }, (_, index) => {
+          const order = orders[index]
+          const isHighlighted = order && highlightedRows.has(order.id)
+          const isNewOrder = order && index < 3
+
+          if (!order) {
+            // Empty placeholder card to maintain consistent height
+            return (
+              <div
+                key={`placeholder-${index}`}
+                className={`${isDarkMode ? 'bg-white/2 border-white/5' : 'bg-black/2 border-black/5'} 
+                  border rounded-xl p-4 opacity-30`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className={`px-3 py-1 rounded-full text-sm ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`}>
+                      <span className="opacity-50">---</span>
+                    </div>
+                    <span className="font-satoshi font-semibold text-sm opacity-50">---</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm opacity-50">--ms</div>
+                    <div className="text-xs opacity-30 font-mono">#------</div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <div className="text-xs opacity-50 font-satoshi mb-1">Waiting for order...</div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
 
           return (
             <div
@@ -612,18 +642,16 @@ const PortfolioSummary = () => {
           )
         })}
 
-        {/* Show More Orders Indicator */}
-        {orders.length > 15 && (
-          <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} 
-            border rounded-xl p-4 text-center`}>
-            <div className="text-sm font-satoshi opacity-70">
-              Showing 15 of {orders.length} active orders
-            </div>
-            <div className="text-xs opacity-50 mt-1">
-              Full table view available on desktop
-            </div>
+        {/* Orders Count Info */}
+        <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} 
+          border rounded-xl p-4 text-center`}>
+          <div className="text-sm font-satoshi opacity-70">
+            Showing {Math.min(orders.length, 15)} of {orders.length} active orders
           </div>
-        )}
+          <div className="text-xs opacity-50 mt-1">
+            Full table view available on desktop
+          </div>
+        </div>
       </div>
     </div>
   )
