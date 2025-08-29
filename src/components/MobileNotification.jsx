@@ -48,25 +48,25 @@ const MobileNotification = () => {
           {/* Content */}
           <div className="flex-1">
             <h3 className={`text-sm font-bold font-ivy ${isDarkMode ? 'text-amber-300' : 'text-amber-800'} mb-1`}>
-              📱 Mobile Device Detected
+              📱 Please View on PC
             </h3>
             <p className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-200' : 'text-amber-700'} leading-relaxed`}>
-              <strong>RicardianCorp Trading Platform</strong> is optimized for desktop/laptop computers with larger screens. 
-              For the best trading experience with full functionality, charts, and real-time data visualization, 
-              please access this platform on your <strong>PC or laptop</strong>.
+              <strong>Please view this platform on your PC or laptop</strong> for the optimal trading experience. 
+              RicardianCorp Trading Platform is designed for desktop computers with full charts, 
+              real-time data, and professional trading tools.
             </p>
             <div className="mt-2 flex items-center space-x-4">
               <div className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-600'} flex items-center space-x-1`}>
                 <span>💻</span>
-                <span>Best on Desktop</span>
+                <span>Use Your PC</span>
               </div>
               <div className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-600'} flex items-center space-x-1`}>
-                <span>⚡</span>
-                <span>HFT Optimized</span>
+                <span>🖥️</span>
+                <span>Desktop Required</span>
               </div>
               <div className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-600'} flex items-center space-x-1`}>
                 <span>📊</span>
-                <span>Professional Trading</span>
+                <span>Full Experience</span>
               </div>
             </div>
           </div>

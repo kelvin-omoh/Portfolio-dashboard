@@ -85,18 +85,18 @@ export const DashboardProvider = ({ children }) => {
     const portfolioInterval = setInterval(() => {
       setPortfolio(prev => {
         // Always profitable - slight upward bias with occasional small dips
-        const valueChange = Math.random() > 0.8 
+        const valueChange = Math.random() > 0.8
           ? -(Math.random() * 15000) // Small dip 20% of the time
           : Math.random() * 35000    // Growth 80% of the time
-        
-        const changeVariation = Math.random() > 0.8 
+
+        const changeVariation = Math.random() > 0.8
           ? -(Math.random() * 8000)  // Small negative change 20% of the time
           : Math.random() * 18000    // Positive change 80% of the time
-        
+
         const newDailyChange = Math.max(prev.dailyChange + changeVariation, 50000) // Never go below 50k daily profit
         const newTotalValue = Math.max(prev.totalValue + valueChange, 2400000) // Never go below 2.4M
         const newChangePercent = (newDailyChange / newTotalValue) * 100
-        
+
         return {
           ...prev,
           totalValue: newTotalValue,
