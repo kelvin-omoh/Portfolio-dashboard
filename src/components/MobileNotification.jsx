@@ -35,66 +35,31 @@ const MobileNotification = () => {
   if (!isMobile || !isVisible) return null
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 ${isDarkMode ? 'bg-amber-900/95' : 'bg-amber-100/95'} backdrop-blur-sm border-b ${isDarkMode ? 'border-amber-700' : 'border-amber-300'}`}>
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-start space-x-3">
+    <div className={`fixed top-0 left-0 right-0 z-50 ${isDarkMode ? 'bg-red-900/95' : 'bg-red-100/95'} backdrop-blur-sm border-b ${isDarkMode ? 'border-red-700' : 'border-red-300'}`}>
+      <div className="container mx-auto px-4 py-2">
+        <div className="flex items-center justify-center space-x-3">
           {/* Warning Icon */}
-          <div className={`flex-shrink-0 w-6 h-6 mt-0.5 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+          <div className={`w-5 h-5 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
 
-          {/* Content */}
-          <div className="flex-1">
-            <h3 className={`text-sm font-bold font-ivy ${isDarkMode ? 'text-amber-300' : 'text-amber-800'} mb-1`}>
-              📱 Please View on PC
-            </h3>
-            <p className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-200' : 'text-amber-700'} leading-relaxed`}>
-              <strong>Please view this platform on your PC or laptop</strong> for the optimal trading experience. 
-              RicardianCorp Trading Platform is designed for desktop computers with full charts, 
-              real-time data, and professional trading tools.
-            </p>
-            <div className="mt-2 flex items-center space-x-4">
-              <div className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-600'} flex items-center space-x-1`}>
-                <span>💻</span>
-                <span>Use Your PC</span>
-              </div>
-              <div className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-600'} flex items-center space-x-1`}>
-                <span>🖥️</span>
-                <span>Desktop Required</span>
-              </div>
-              <div className={`text-xs font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-600'} flex items-center space-x-1`}>
-                <span>📊</span>
-                <span>Full Experience</span>
-              </div>
-            </div>
+          {/* Simple Warning Message */}
+          <div className={`font-bold font-satoshi ${isDarkMode ? 'text-red-300' : 'text-red-800'} text-sm`}>
+            ⚠️ VIEW ONLY ON PC - This platform requires desktop/laptop computer
           </div>
 
           {/* Dismiss Button */}
           <button
             onClick={handleDismiss}
-            className={`flex-shrink-0 w-6 h-6 rounded-full ${isDarkMode ? 'text-amber-400 hover:bg-amber-800/50' : 'text-amber-600 hover:bg-amber-200/50'} transition-colors duration-200 flex items-center justify-center`}
-            title="Dismiss notification"
+            className={`w-5 h-5 rounded-full ${isDarkMode ? 'text-red-400 hover:bg-red-800/50' : 'text-red-600 hover:bg-red-200/50'} transition-colors duration-200 flex items-center justify-center`}
+            title="Dismiss warning"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        </div>
-
-        {/* Additional Info Bar */}
-        <div className={`mt-3 pt-2 border-t ${isDarkMode ? 'border-amber-700/50' : 'border-amber-300/50'}`}>
-          <div className="flex items-center justify-between text-xs">
-            <div className={`font-satoshi ${isDarkMode ? 'text-amber-300' : 'text-amber-700'} flex items-center space-x-1`}>
-              <span>🏢</span>
-              <span>RicardianCorp Professional Trading Platform</span>
-            </div>
-            <div className={`font-satoshi ${isDarkMode ? 'text-amber-400' : 'text-amber-600'} flex items-center space-x-1`}>
-              <span>📞</span>
-              <span>enterprise@ricardiancorp.com</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
