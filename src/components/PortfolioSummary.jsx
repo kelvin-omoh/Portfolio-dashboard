@@ -304,8 +304,8 @@ const PortfolioSummary = () => {
       const updateEnd = performance.now()
       setSystemLatency(updateEnd - updateStart)
 
-      setTimeout(() => setIsUpdating(false), 50)
-    }, 50) // Blazing fast updates - every 50ms (20 FPS like real HFT)
+      setTimeout(() => setIsUpdating(false), 150)
+    }, 200) // Fast updates - every 200ms (5 FPS for better visibility)
 
     return () => clearInterval(interval)
   }, [])

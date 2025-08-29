@@ -19,7 +19,7 @@ const Header = () => {
         dailyVolume: prev.dailyVolume + Math.floor(Math.random() * 40000) + 8000, // More aggressive volume
         systemLatency: Math.random() * 15 + 2 // 2-17ms realistic latency
       }))
-    }, 750) // Very fast updates - every 750ms
+    }, 1500) // Moderate updates - every 1.5 seconds
 
     return () => clearInterval(interval)
   }, [])

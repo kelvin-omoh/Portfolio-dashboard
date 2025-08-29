@@ -47,7 +47,7 @@ const ExchangeOverview = ({ exchanges }) => {
           volume: prev.Quidax.volume + Math.floor(Math.random() * 15000000) + 3000000 // Constantly increasing crypto volume
         }
       }))
-    }, 800) // Ultra-fast updates - every 800ms
+    }, 2000) // Moderate updates - every 2 seconds
 
     return () => clearInterval(interval)
   }, [])
