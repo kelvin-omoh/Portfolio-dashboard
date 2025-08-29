@@ -201,7 +201,7 @@ const Header = () => {
                 <p className="text-xs font-satoshi opacity-60">HFT Trading</p>
               </div>
             </div>
-            
+
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-all duration-300 ${isDarkMode
