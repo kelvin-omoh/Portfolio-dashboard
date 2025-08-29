@@ -35,8 +35,8 @@ const PortfolioSummary = () => {
 
         // Realistic order amounts based on asset type
         const baseAmount = isCrypto ?
-          Math.floor(Math.random() * 500000) + 50000 : // ₦50K - ₦550K for crypto
-          Math.floor(Math.random() * 2000000) + 100000 // ₦100K - ₦2.1M for stocks
+          Math.floor(Math.random() * 150000) + 20000 : // ₦20K - ₦170K for crypto
+          Math.floor(Math.random() * 300000) + 50000 // ₦50K - ₦350K for stocks
 
         const filledAmount = Math.floor(baseAmount * Math.random() * 0.6) // Conservative fills
         const fraction = filledAmount / baseAmount
@@ -132,8 +132,8 @@ const PortfolioSummary = () => {
 
             // Realistic amounts
             const amount = isCrypto ?
-              Math.floor(Math.random() * 1000000) + 100000 : // ₦100K - ₦1.1M for crypto
-              Math.floor(Math.random() * 5000000) + 200000   // ₦200K - ₦5.2M for stocks
+              Math.floor(Math.random() * 150000) + 30000 : // ₦30K - ₦180K for crypto
+              Math.floor(Math.random() * 250000) + 75000   // ₦75K - ₦325K for stocks
 
             const filledAmount = Math.floor(amount * Math.random() * 0.2) // Start mostly unfilled
             const fraction = filledAmount / amount
@@ -195,8 +195,8 @@ const PortfolioSummary = () => {
             const position = Math.random() > 0.5 ? 'buy' : 'sell'
             const orderType = Math.random() > 0.7 ? 'limit' : 'market'
             const amount = isCrypto ?
-              Math.floor(Math.random() * 1000000) + 100000 :
-              Math.floor(Math.random() * 5000000) + 200000
+              Math.floor(Math.random() * 150000) + 30000 :
+              Math.floor(Math.random() * 250000) + 75000
             const filledAmount = Math.floor(amount * Math.random() * 0.3)
             const fraction = filledAmount / amount
             // Generate realistic entry time (1-10 minutes ago for emergency orders)

@@ -33,7 +33,7 @@ export const DashboardProvider = ({ children }) => {
   const [portfolio, setPortfolio] = useState({
     totalValue: 2546720,
     dailyChange: 127340,
-    dailyChangePercent: 5.26,
+    dailyChangePercent: 4.99,
     positions: [
       { symbol: 'MTN', quantity: 1000, avgPrice: 150, currentPrice: 165, change: 10.0 },
       { symbol: 'DANGOTE', quantity: 500, avgPrice: 200, currentPrice: 212, change: 6.0 },
@@ -62,7 +62,7 @@ export const DashboardProvider = ({ children }) => {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
         label: 'Portfolio Value',
-        data: [2040000, 2185000, 2245000, 2397000, 2418000, 2546720],
+        data: [2040000, 2185000, 2245000, 2397000, 2481000, 2546720],
         borderColor: '#ffffff',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         tension: 0.4
@@ -72,7 +72,7 @@ export const DashboardProvider = ({ children }) => {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
         label: 'ROI %',
-        data: [0, 7.1, 2.7, 6.8, 0.9, 5.3],
+        data: [0, 7.1, 2.7, 6.8, 3.5, 2.6],
         borderColor: '#00ff00',
         backgroundColor: 'rgba(0, 255, 0, 0.1)',
         tension: 0.4
@@ -94,7 +94,7 @@ export const DashboardProvider = ({ children }) => {
           : Math.random() * 18000    // Positive change 80% of the time
 
         const newDailyChange = Math.max(prev.dailyChange + changeVariation, 50000) // Never go below 50k daily profit
-        const newTotalValue = Math.max(prev.totalValue + valueChange, 2400000) // Never go below 2.4M
+        const newTotalValue = Math.min(Math.max(prev.totalValue + valueChange, 2400000), 2580000) // Between 2.4M and 2.58M
         const newChangePercent = (newDailyChange / newTotalValue) * 100
 
         return {
