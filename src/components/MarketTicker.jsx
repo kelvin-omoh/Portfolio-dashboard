@@ -83,7 +83,7 @@ const MarketTicker = () => {
                     </div>
                     <div>
                       <p className="font-semibold font-satoshi">{ticker.symbol}</p>
-                      <p className="text-xs font-satoshi opacity-60">NSE</p>
+                      <p className="text-xs font-satoshi opacity-60">NGX</p>
                     </div>
                   </div>
                 </td>

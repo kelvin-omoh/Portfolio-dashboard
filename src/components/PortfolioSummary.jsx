@@ -1,6 +1,6 @@
 import { useDashboard } from '../contexts/DashboardContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const PortfolioSummary = () => {
   const { portfolio, marketData } = useDashboard()
@@ -11,14 +11,44 @@ const PortfolioSummary = () => {
   const [orderFlow, setOrderFlow] = useState({ buys: 0, sells: 0, volume: 0 })
   const [marketDepth, setMarketDepth] = useState({ bidCount: 0, askCount: 0 })
   const [systemLatency, setSystemLatency] = useState(0)
+  const [totalOrdersCount, setTotalOrdersCount] = useState(0) // Cumulative counter
+  const [totalFilledCount, setTotalFilledCount] = useState(0) // Cumulative filled counter
+  const [isVisible, setIsVisible] = useState(false) // Track section visibility
+  const [loadingPhase, setLoadingPhase] = useState('initial') // Track loading phase
+  const [startTime, setStartTime] = useState(null) // Track when loading started
+  const componentRef = useRef(null) // Reference to the component
+
+  // Intersection Observer to detect when component becomes visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true)
+          setStartTime(Date.now())
+          setLoadingPhase('loading')
+        }
+      },
+      { threshold: 0.3 } // Trigger when 30% of component is visible
+    )
+
+    if (componentRef.current) {
+      observer.observe(componentRef.current)
+    }
+
+    return () => {
+      if (componentRef.current) {
+        observer.unobserve(componentRef.current)
+      }
+    }
+  }, [isVisible])
 
   // Generate initial trading orders
   useEffect(() => {
     const generateOrders = () => {
-      const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO']
-      const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT']
+      const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO', 'Nigerian_BREWERIES', 'CADBURY', 'FLOURMILL', 'HONEYWELL', 'JBERGER', 'LIVESTOCK', 'NASCON', 'PZ', 'VITAFOAM', 'CORNERST', 'FIDELITYBK', 'STERLINGNG', 'UNITY', 'WEMABANK', 'CHAMPION', 'CUTIX', 'ETERNA', 'JAPAULGOLD', 'MOBIL', 'OANDO', 'TOTAL', 'CONOIL', 'MRS', 'ARDOVA']
+      const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT', 'AVAXUSDT', 'MATICUSDT', 'ATOMUSDT', 'NEARUSDT', 'FTMUSDT', 'ALGOUSDT', 'VETUSDT', 'ICPUSDT', 'FILUSDT', 'APTUSDT', 'SUIUSDT', 'ARBUSDT', 'OPUSDT', 'INJUSDT', 'STXUSDT', 'THETAUSDT', 'FLOWUSDT', 'EGLDUSDT', 'AXSUSDT', 'SANDUSDT', 'MANAUSDT', 'CHZUSDT', 'ENJUSDT', 'GALAUSDT']
       const allSymbols = [...nseSymbols, ...cryptoSymbols]
-      const exchanges = ['NSE', 'Quidax']
+      const exchanges = ['NGX', 'Quidax']
       const orderTypes = ['market', 'limit']
       const positions = ['buy', 'sell']
 
@@ -26,17 +56,19 @@ const PortfolioSummary = () => {
       const sessionStart = new Date()
       sessionStart.setHours(9, 0, 0, 0) // Market opens at 9 AM
 
-      return Array.from({ length: 75 }, (_, index) => {
+      // Start with 70 orders, will progressively load more when visible
+      const initialCount = isVisible ? 70 : 0
+      return Array.from({ length: initialCount }, (_, index) => {
         const symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)]
         const isCrypto = cryptoSymbols.includes(symbol)
-        const exchange = isCrypto ? 'Quidax' : 'NSE'
+        const exchange = isCrypto ? 'Quidax' : 'NGX'
         const position = positions[Math.floor(Math.random() * positions.length)]
         const orderType = orderTypes[Math.floor(Math.random() * orderTypes.length)]
 
-        // Realistic order amounts based on asset type
+        // Higher volume order amounts for substantial trading
         const baseAmount = isCrypto ?
-          Math.floor(Math.random() * 150000) + 20000 : // ₦20K - ₦170K for crypto
-          Math.floor(Math.random() * 300000) + 50000 // ₦50K - ₦350K for stocks
+          Math.floor(Math.random() * 500000) + 100000 : // ₦100K - ₦600K for crypto
+          Math.floor(Math.random() * 1000000) + 200000 // ₦200K - ₦1.2M for stocks
 
         const filledAmount = Math.floor(baseAmount * Math.random() * 0.6) // Conservative fills
         const fraction = filledAmount / baseAmount
@@ -54,7 +86,7 @@ const PortfolioSummary = () => {
 
         // Generate realistic order ID
         const timestamp = entryTime.getTime().toString().slice(-6)
-        const venue = exchange === 'NSE' ? 'NSE' : 'QDX'
+        const venue = exchange === 'NGX' ? 'NGX' : 'QDX'
         const side = position === 'buy' ? 'B' : 'S'
         const orderCounter = (index + 1).toString().padStart(4, '0')
         const realisticId = `${venue}${side}${timestamp}${orderCounter}`
@@ -85,11 +117,19 @@ const PortfolioSummary = () => {
       })
     }
 
-    setOrders(generateOrders())
-  }, [])
+    // Only generate initial orders when component becomes visible
+    if (isVisible && orders.length === 0) {
+      const initialOrders = generateOrders()
+      setOrders(initialOrders)
+      setTotalOrdersCount(initialOrders.length) // Initialize cumulative counter
+      setTotalFilledCount(initialOrders.filter(o => o.status === 'filled').length)
+    }
+  }, [isVisible])
 
-  // Ultra-fast HFT updates
+  // Progressive order loading and HFT updates (only when visible)
   useEffect(() => {
+    if (!isVisible) return // Don't run if not visible
+
     const interval = setInterval(() => {
       const updateStart = performance.now()
       setIsUpdating(true)
@@ -97,43 +137,62 @@ const PortfolioSummary = () => {
       setOrders(prevOrders => {
         let updatedOrders = [...prevOrders]
 
-        // Aggressive order lifecycle - HFT style with continuous recycling
-        updatedOrders = updatedOrders.filter(order => {
-          if (order.status === 'filled') {
-            return Math.random() > 0.4 // 40% chance to remove filled orders (faster turnover)
-          }
-          // Also remove very old orders to prevent accumulation
-          const orderAge = (Date.now() - order.entryTime.getTime()) / 1000
-          if (orderAge > 300) { // Remove orders older than 5 minutes
-            return Math.random() > 0.6 // 60% chance to remove old orders
-          }
-          return true
-        })
+        // Progressive loading logic: 70 → 500+ over 4 minutes
+        const elapsedTime = startTime ? (Date.now() - startTime) / 1000 : 0 // seconds
+        const fourMinutes = 240 // 4 minutes in seconds
+        const progressPercent = Math.min(elapsedTime / fourMinutes, 1) // 0 to 1 over 4 minutes
 
-        // Maintain optimal order count - force recycling when needed
-        if (updatedOrders.length > 85) {
-          // Aggressively remove older orders when approaching limit
-          updatedOrders = updatedOrders.slice(0, 60) // Keep only newest 60 orders
+        // Calculate target order count based on progress (70 → 600 over 4 minutes)
+        const targetOrderCount = Math.floor(70 + (530 * progressPercent))
+
+        // Separation of concerns: Order lifecycle management
+        let newOrdersAdded = 0
+        let ordersCompleted = 0
+
+        // Never remove orders during the progressive loading phase (4 minutes)
+        if (elapsedTime > fourMinutes) {
+          // Only remove orders when absolutely necessary (after 4 minutes)
+          updatedOrders = updatedOrders.filter(order => {
+            // Remove only extremely old orders to free memory
+            const orderAge = (Date.now() - order.entryTime.getTime()) / 1000
+            if (orderAge > 1800) { // Remove orders older than 30 minutes
+              return Math.random() > 0.95 // Only remove 5% to preserve history
+            }
+            return true
+          })
         }
 
-        // Ultra-high frequency order injection with realistic data
-        const newOrderCount = Math.floor(Math.random() * 6) + 3 // 3-8 new orders per cycle
-        for (let i = 0; i < newOrderCount; i++) { // Remove length limit to ensure continuous flow
-          if (Math.random() > 0.3) { // 70% chance to add new order
-            const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO']
-            const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT']
+        // Maintain optimal order count - only remove when really necessary
+        if (updatedOrders.length > 800) {
+          // Only trim when we have too many orders
+          updatedOrders = updatedOrders.slice(0, 600) // Keep many more orders
+        }
+
+        // Progressive order injection based on target count
+        const currentShortfall = targetOrderCount - updatedOrders.length
+        const shouldAddOrders = currentShortfall > 0
+
+        if (shouldAddOrders) {
+          // Calculate how many orders to add this cycle to reach target smoothly
+          const ordersToAdd = elapsedTime < fourMinutes
+            ? Math.min(Math.ceil(currentShortfall / 20), 8) // Progressive: add up to 8 orders per cycle
+            : Math.floor(Math.random() * 3) + 1 // After 4 min: normal 1-3 orders
+
+          for (let i = 0; i < ordersToAdd; i++) {
+            const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO', 'Nigerian_BREWERIES', 'CADBURY', 'FLOURMILL', 'HONEYWELL', 'JBERGER', 'LIVESTOCK', 'NASCON', 'PZ', 'VITAFOAM', 'CORNERST', 'FIDELITYBK', 'STERLINGNG', 'UNITY', 'WEMABANK', 'CHAMPION', 'CUTIX', 'ETERNA', 'JAPAULGOLD', 'MOBIL', 'OANDO', 'TOTAL', 'CONOIL', 'MRS', 'ARDOVA']
+            const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT', 'AVAXUSDT', 'MATICUSDT', 'ATOMUSDT', 'NEARUSDT', 'FTMUSDT', 'ALGOUSDT', 'VETUSDT', 'ICPUSDT', 'FILUSDT', 'APTUSDT', 'SUIUSDT', 'ARBUSDT', 'OPUSDT', 'INJUSDT', 'STXUSDT', 'THETAUSDT', 'FLOWUSDT', 'EGLDUSDT', 'AXSUSDT', 'SANDUSDT', 'MANAUSDT', 'CHZUSDT', 'ENJUSDT', 'GALAUSDT']
             const allSymbols = [...nseSymbols, ...cryptoSymbols]
 
             const symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)]
             const isCrypto = cryptoSymbols.includes(symbol)
-            const exchange = isCrypto ? 'Quidax' : 'NSE'
+            const exchange = isCrypto ? 'Quidax' : 'NGX'
             const position = Math.random() > 0.5 ? 'buy' : 'sell'
             const orderType = Math.random() > 0.7 ? 'limit' : 'market'
 
-            // Realistic amounts
+            // Higher volume amounts for substantial trading
             const amount = isCrypto ?
-              Math.floor(Math.random() * 150000) + 30000 : // ₦30K - ₦180K for crypto
-              Math.floor(Math.random() * 250000) + 75000   // ₦75K - ₦325K for stocks
+              Math.floor(Math.random() * 500000) + 100000 : // ₦100K - ₦600K for crypto
+              Math.floor(Math.random() * 1000000) + 200000   // ₦200K - ₦1.2M for stocks
 
             const filledAmount = Math.floor(amount * Math.random() * 0.2) // Start mostly unfilled
             const fraction = filledAmount / amount
@@ -147,7 +206,7 @@ const PortfolioSummary = () => {
 
             // Generate realistic order ID
             const timestamp = entryTime.getTime().toString().slice(-6)
-            const venue = exchange === 'NSE' ? 'NSE' : 'QDX'
+            const venue = exchange === 'NGX' ? 'NGX' : 'QDX'
             const side = position === 'buy' ? 'B' : 'S'
             const orderCounter = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
             const realisticId = `${venue}${side}${timestamp}${orderCounter}`
@@ -177,26 +236,27 @@ const PortfolioSummary = () => {
             }
 
             updatedOrders.unshift(newOrder) // Add to beginning
+            newOrdersAdded++ // Track new orders
           }
         }
 
-        // Ensure minimum order count for continuous activity
-        if (updatedOrders.length < 20) {
+        // No emergency orders during progressive loading phase (first 4 minutes)
+        if (elapsedTime > fourMinutes && updatedOrders.length < 200) {
           // Force add orders if count gets too low
-          const emergencyOrderCount = 25 - updatedOrders.length
+          const emergencyOrderCount = 300 - updatedOrders.length
           for (let i = 0; i < emergencyOrderCount; i++) {
-            const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO']
-            const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT']
+            const nseSymbols = ['MTNN', 'DANGCEM', 'ZENITHBANK', 'GTCO', 'ACCESSCORP', 'UBA', 'FBNH', 'NESTLE', 'UNILEVER', 'GUINNESS', 'BUACEMENT', 'SEPLAT', 'AIRTELAFRI', 'STANBIC', 'WAPCO', 'Nigerian_BREWERIES', 'CADBURY', 'FLOURMILL', 'HONEYWELL', 'JBERGER', 'LIVESTOCK', 'NASCON', 'PZ', 'VITAFOAM', 'CORNERST', 'FIDELITYBK', 'STERLINGNG', 'UNITY', 'WEMABANK', 'CHAMPION', 'CUTIX', 'ETERNA', 'JAPAULGOLD', 'MOBIL', 'OANDO', 'TOTAL', 'CONOIL', 'MRS', 'ARDOVA']
+            const cryptoSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'XRPUSDT', 'LTCUSDT', 'DOGEUSDT', 'AVAXUSDT', 'MATICUSDT', 'ATOMUSDT', 'NEARUSDT', 'FTMUSDT', 'ALGOUSDT', 'VETUSDT', 'ICPUSDT', 'FILUSDT', 'APTUSDT', 'SUIUSDT', 'ARBUSDT', 'OPUSDT', 'INJUSDT', 'STXUSDT', 'THETAUSDT', 'FLOWUSDT', 'EGLDUSDT', 'AXSUSDT', 'SANDUSDT', 'MANAUSDT', 'CHZUSDT', 'ENJUSDT', 'GALAUSDT']
             const allSymbols = [...nseSymbols, ...cryptoSymbols]
 
             const symbol = allSymbols[Math.floor(Math.random() * allSymbols.length)]
             const isCrypto = cryptoSymbols.includes(symbol)
-            const exchange = isCrypto ? 'Quidax' : 'NSE'
+            const exchange = isCrypto ? 'Quidax' : 'NGX'
             const position = Math.random() > 0.5 ? 'buy' : 'sell'
             const orderType = Math.random() > 0.7 ? 'limit' : 'market'
             const amount = isCrypto ?
-              Math.floor(Math.random() * 150000) + 30000 :
-              Math.floor(Math.random() * 250000) + 75000
+              Math.floor(Math.random() * 500000) + 100000 :
+              Math.floor(Math.random() * 1000000) + 200000
             const filledAmount = Math.floor(amount * Math.random() * 0.3)
             const fraction = filledAmount / amount
             // Generate realistic entry time (1-10 minutes ago for emergency orders)
@@ -206,7 +266,7 @@ const PortfolioSummary = () => {
               Math.random() * 20 + 3
 
             const timestamp = entryTime.getTime().toString().slice(-6)
-            const venue = exchange === 'NSE' ? 'NSE' : 'QDX'
+            const venue = exchange === 'NGX' ? 'NGX' : 'QDX'
             const side = position === 'buy' ? 'B' : 'S'
             const orderCounter = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
             const realisticId = `${venue}${side}${timestamp}${orderCounter}`
@@ -232,8 +292,8 @@ const PortfolioSummary = () => {
         // Ultra-fast HFT order execution simulation
         const newHighlighted = new Set()
         const updatedOrdersWithHighlight = updatedOrders.map(order => {
-          // Aggressive HFT progression - orders fill very quickly
-          const fillSpeed = order.orderType === 'market' ? 0.8 : 0.4 // Market orders fill faster
+          // Controlled HFT progression - orders fill at reasonable rate
+          const fillSpeed = order.orderType === 'market' ? 0.3 : 0.15 // Market orders fill faster but not too fast
           const progressIncrement = Math.random() * fillSpeed
           const newFilledAmount = Math.min(order.amount, order.filledAmount + (order.amount * progressIncrement))
           const newFraction = newFilledAmount / order.amount
@@ -261,6 +321,9 @@ const PortfolioSummary = () => {
           if (newFraction >= 1 && !order.fillTime) {
             newFillTime = currentTime
             newStatus = 'filled'
+            if (order.status !== 'filled') {
+              ordersCompleted++ // Track newly completed orders
+            }
           } else if (newFraction > 0.8) {
             newStatus = 'partial'
           } else if (newFraction > 0.2) {
@@ -297,6 +360,19 @@ const PortfolioSummary = () => {
           setHighlightedRows(new Set())
         }, 100)
 
+        // Update cumulative counters (separation of concerns)
+        if (newOrdersAdded > 0) {
+          setTotalOrdersCount(prev => prev + newOrdersAdded)
+        }
+        if (ordersCompleted > 0) {
+          setTotalFilledCount(prev => prev + ordersCompleted)
+        }
+
+        // Update loading phase
+        if (elapsedTime >= fourMinutes && loadingPhase === 'loading') {
+          setLoadingPhase('complete')
+        }
+
         return updatedOrdersWithHighlight
       })
 
@@ -308,7 +384,7 @@ const PortfolioSummary = () => {
     }, 200) // Fast updates - every 200ms (5 FPS for better visibility)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [isVisible, startTime, loadingPhase])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-NG', {
@@ -364,7 +440,7 @@ const PortfolioSummary = () => {
   }
 
   return (
-    <div className={`${isDarkMode ? 'glass' : 'card-light'} rounded-xl md:rounded-2xl p-4 md:p-8 animated-border theme-transition`}>
+    <div ref={componentRef} className={`${isDarkMode ? 'glass' : 'card-light'} rounded-xl md:rounded-2xl p-4 md:p-8 animated-border theme-transition`}>
       {/* HFT Header with Real-time Metrics */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 space-y-3 md:space-y-0">
         <div>
@@ -375,7 +451,7 @@ const PortfolioSummary = () => {
               {isUpdating ? 'LIVE' : 'IDLE'}
             </span>
           </h2>
-          <p className="text-xs md:text-sm font-satoshi opacity-70 hidden sm:block">Ultra-low latency order execution • 100ms update cycle</p>
+          <p className="text-xs md:text-sm font-satoshi opacity-70 hidden sm:block">Ultra-low latency order execution • 200ms update cycle</p>
           <p className="text-xs font-satoshi opacity-70 sm:hidden">Real-time order execution</p>
         </div>
         <div className="grid grid-cols-2 gap-2 md:gap-4">
@@ -402,11 +478,11 @@ const PortfolioSummary = () => {
       <div className="mb-6 md:mb-8 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
         <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
           <h3 className="text-sm font-satoshi opacity-70 mb-1">Total Orders</h3>
-          <p className="text-2xl font-bold font-satoshi">{orders.length}</p>
+          <p className="text-2xl font-bold font-satoshi">{totalOrdersCount.toLocaleString()}</p>
         </div>
         <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
           <h3 className="text-sm font-satoshi opacity-70 mb-1">Filled Orders</h3>
-          <p className="text-2xl font-bold font-satoshi text-green-500">{orders.filter(o => o.status === 'filled').length}</p>
+          <p className="text-2xl font-bold font-satoshi text-green-500">{totalFilledCount.toLocaleString()}</p>
         </div>
         <div className={`${isDarkMode ? 'bg-white/5' : 'bg-black/5'} rounded-xl p-4 text-center`}>
           <h3 className="text-sm font-satoshi opacity-70 mb-1">Avg. Fill Rate</h3>
@@ -493,7 +569,7 @@ const PortfolioSummary = () => {
                     </div>
                   </td>
                   <td className="py-4 px-3">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${order.exchange === 'NSE' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${order.exchange === 'NGX' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}`}>
                       {order.exchange}
                     </span>
                   </td>

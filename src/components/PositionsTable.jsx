@@ -17,7 +17,7 @@ const PositionsTable = () => {
                     symbol: 'MTN',
                     name: 'MTN Nigeria',
                     shares: 1500,
-                    exchange: 'NSE',
+                    exchange: 'NGX',
                     fraction: 0.15,
                     orderType: 'Market',
                     time: '09:30:15',
@@ -38,7 +38,7 @@ const PositionsTable = () => {
                     symbol: 'DANGCEM',
                     name: 'Dangote Cement',
                     shares: 800,
-                    exchange: 'NSE',
+                    exchange: 'NGX',
                     fraction: 0.08,
                     orderType: 'Limit',
                     time: '10:15:22',
@@ -59,7 +59,7 @@ const PositionsTable = () => {
                     symbol: 'ZENITH',
                     name: 'Zenith Bank',
                     shares: 2000,
-                    exchange: 'NSE',
+                    exchange: 'NGX',
                     fraction: 0.20,
                     orderType: 'Market',
                     time: '11:45:08',
@@ -122,7 +122,7 @@ const PositionsTable = () => {
                     symbol: 'GUARANTY',
                     name: 'Guaranty Trust Bank',
                     shares: 1200,
-                    exchange: 'NSE',
+                    exchange: 'NGX',
                     fraction: 0.12,
                     orderType: 'Limit',
                     time: '14:30:33',
@@ -272,17 +272,17 @@ const PositionsTable = () => {
                 <div className="flex items-center space-x-4">
                     <span className="text-sm font-satoshi opacity-70">Filter:</span>
                     <div className="flex space-x-2">
-                        {['All', 'NSE', 'Quidax'].map((exchange) => (
+                        {['All', 'NGX', 'Quidax'].map((exchange) => (
                             <button
                                 key={exchange}
                                 onClick={() => setSelectedExchange(exchange)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium font-satoshi transition-all duration-200 ${selectedExchange === exchange
-                                        ? isDarkMode
-                                            ? 'bg-white text-black shadow-lg'
-                                            : 'bg-black text-white shadow-lg'
-                                        : isDarkMode
-                                            ? 'bg-white/10 text-white/70 hover:bg-white/20'
-                                            : 'bg-black/5 text-black/70 hover:bg-black/10'
+                                    ? isDarkMode
+                                        ? 'bg-white text-black shadow-lg'
+                                        : 'bg-black text-white shadow-lg'
+                                    : isDarkMode
+                                        ? 'bg-white/10 text-white/70 hover:bg-white/20'
+                                        : 'bg-black/5 text-black/70 hover:bg-black/10'
                                     }`}
                             >
                                 {exchange}
@@ -350,7 +350,7 @@ const PositionsTable = () => {
                                     {/* Position */}
                                     <div className="col-span-2">
                                         <div className="flex items-center space-x-3">
-                                            <div className={`px-2 py-1 rounded text-xs font-medium font-satoshi ${position.exchange === 'NSE'
+                                            <div className={`px-2 py-1 rounded text-xs font-medium font-satoshi ${position.exchange === 'NGX'
                                                 ? isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-800'
                                                 : isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-800'
                                                 }`}>
@@ -374,7 +374,7 @@ const PositionsTable = () => {
 
                                     {/* Exchange */}
                                     <div className="col-span-1 text-center">
-                                        <div className={`px-2 py-1 rounded text-xs font-medium font-satoshi ${position.exchange === 'NSE'
+                                        <div className={`px-2 py-1 rounded text-xs font-medium font-satoshi ${position.exchange === 'NGX'
                                             ? isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-800'
                                             : isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-800'
                                             }`}>

@@ -5,9 +5,9 @@ import { useState, useEffect } from 'react'
 const ExchangeOverview = ({ exchanges }) => {
   const { isDarkMode } = useTheme()
   const { marketData } = useDashboard()
-  const [activeTab, setActiveTab] = useState('NSE')
+  const [activeTab, setActiveTab] = useState('NGX')
   const [exchangeStatus, setExchangeStatus] = useState({
-    NSE: { status: 'active', lastUpdate: new Date(), latency: 12, volume: 0 }, // Realistic NSE latency
+    NGX: { status: 'active', lastUpdate: new Date(), latency: 12, volume: 0 }, // Realistic NGX latency
     Quidax: { status: 'active', lastUpdate: new Date(), latency: 23, volume: 0 } // Realistic crypto latency
   })
 
@@ -32,12 +32,12 @@ const ExchangeOverview = ({ exchanges }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setExchangeStatus(prev => ({
-        NSE: {
-          ...prev.NSE,
+        NGX: {
+          ...prev.NGX,
           lastUpdate: new Date(),
-          latency: Math.floor(Math.random() * 20) + 3, // 3-23ms realistic NSE latency
+          latency: Math.floor(Math.random() * 20) + 3, // 3-23ms realistic NGX latency
           status: Math.random() > 0.98 ? 'warning' : 'active',
-          volume: prev.NSE.volume + Math.floor(Math.random() * 25000000) + 5000000 // Constantly increasing NSE volume
+          volume: prev.NGX.volume + Math.floor(Math.random() * 25000000) + 5000000 // Constantly increasing NGX volume
         },
         Quidax: {
           ...prev.Quidax,
@@ -104,7 +104,7 @@ const ExchangeOverview = ({ exchanges }) => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl md:text-2xl font-bold font-ivy mb-1 md:mb-2">Exchange Overview</h2>
-            <p className="text-xs md:text-sm font-satoshi opacity-70 hidden sm:block">Live market data • NSE equities & crypto trading • Sub-30ms latency</p>
+            <p className="text-xs md:text-sm font-satoshi opacity-70 hidden sm:block">Live market data • NGX equities & crypto trading • Sub-30ms latency</p>
             <p className="text-xs font-satoshi opacity-70 sm:hidden">Live market data</p>
           </div>
           <div className="hidden sm:flex items-center space-x-2">
@@ -116,10 +116,10 @@ const ExchangeOverview = ({ exchanges }) => {
 
       {/* Dynamic Tab Navigation */}
       <div className="flex space-x-2 md:space-x-3 mb-6 md:mb-8">
-        {['NSE', 'Quidax'].map((exchange) => {
+        {['NGX', 'Quidax'].map((exchange) => {
           const status = exchangeStatus[exchange]
           const isActive = activeTab === exchange
-          const data = exchange === 'NSE' ? getNseData() : getQuidaxData()
+          const data = exchange === 'NGX' ? getNseData() : getQuidaxData()
 
           return (
             <button
@@ -167,10 +167,10 @@ const ExchangeOverview = ({ exchanges }) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-xs opacity-70 mb-1">
-                        {exchange === 'NSE' ? 'Market Cap' : 'BTC Price'}
+                        {exchange === 'NGX' ? 'Market Cap' : 'BTC Price'}
                       </div>
                       <div className="text-sm font-semibold">
-                        {exchange === 'NSE'
+                        {exchange === 'NGX'
                           ? `₦${formatNumber(data.marketCap)}`
                           : `₦${formatNumber(data.btcPrice)}`
                         }
@@ -218,7 +218,7 @@ const ExchangeOverview = ({ exchanges }) => {
       <div className="space-y-6">
         {/* Desktop View */}
         <div className="hidden md:block">
-          {activeTab === 'NSE' && (
+          {activeTab === 'NGX' && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg border`}>
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${isDarkMode ? 'bg-white/20 border border-white/20' : 'bg-black/20 border border-black/30'}`}>
@@ -333,12 +333,12 @@ const ExchangeOverview = ({ exchanges }) => {
 
         {/* Mobile View - Simplified Cards */}
         <div className="md:hidden">
-          {activeTab === 'NSE' && (
+          {activeTab === 'NGX' && (
             <div className="space-y-4">
               {/* Primary Market Data Card */}
               <div className={`${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/10 border-black/30'} rounded-xl p-4 border`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold font-satoshi">NSE Market Data</h3>
+                  <h3 className="text-lg font-bold font-satoshi">NGX Market Data</h3>
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
 

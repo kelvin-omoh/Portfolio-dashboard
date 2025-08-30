@@ -100,7 +100,7 @@ const Header = () => {
               <h1 className={`text-3xl font-bold font-ivy ${isDarkMode ? 'text-white' : 'text-black'}`}>
                 RicardianCorp
               </h1>
-              <p className="text-sm font-satoshi opacity-70 mt-1">Professional HFT Platform • NSE & Crypto Markets • Ultra-Low Latency</p>
+              <p className="text-sm font-satoshi opacity-70 mt-1">Professional HFT Platform • NGX & Crypto Markets • Ultra-Low Latency</p>
             </div>
           </div>
 

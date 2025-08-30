@@ -13,8 +13,8 @@ export const useDashboard = () => {
 export const DashboardProvider = ({ children }) => {
   const [exchanges, setExchanges] = useState([
     {
-      id: 'nse',
-      name: 'Nigeria Stock Exchange',
+      id: 'ngx',
+      name: 'Nigerian Exchange Group',
       status: 'active',
       lastUpdate: new Date(),
       volume: 1250000000,
@@ -42,7 +42,7 @@ export const DashboardProvider = ({ children }) => {
   })
 
   const [marketData, setMarketData] = useState({
-    nse: {
+    ngx: {
       allShareIndex: 51234.56,
       marketCap: 28500000000000,
       volume: 1250000000,
@@ -84,35 +84,38 @@ export const DashboardProvider = ({ children }) => {
   useEffect(() => {
     const portfolioInterval = setInterval(() => {
       setPortfolio(prev => {
-        // Always profitable - slight upward bias with occasional small dips
-        const valueChange = Math.random() > 0.8
-          ? -(Math.random() * 15000) // Small dip 20% of the time
-          : Math.random() * 35000    // Growth 80% of the time
+        // Calculate realistic daily change percentage first (3-8%)
+        const dailyChangePercent = Math.random() * 5 + 3 // 3-8% range
 
-        const changeVariation = Math.random() > 0.8
-          ? -(Math.random() * 8000)  // Small negative change 20% of the time
-          : Math.random() * 18000    // Positive change 80% of the time
+        // Base portfolio value with slight growth trend
+        const baseGrowth = Math.random() > 0.7
+          ? -(Math.random() * 20000) // Small dip 30% of the time
+          : Math.random() * 45000    // Growth 70% of the time
 
-        const newDailyChange = Math.max(prev.dailyChange + changeVariation, 50000) // Never go below 50k daily profit
-        const newTotalValue = Math.min(Math.max(prev.totalValue + valueChange, 2400000), 2580000) // Between 2.4M and 2.58M
-        const newChangePercent = (newDailyChange / newTotalValue) * 100
+        const newTotalValue = Math.min(Math.max(prev.totalValue + baseGrowth, 2400000), 2650000) // Between 2.4M and 2.65M
+
+        // Calculate daily change based on percentage to ensure alignment
+        const newDailyChange = (newTotalValue * dailyChangePercent) / 100
+
+        // Ensure values are realistic and aligned
+        const yesterdayValue = newTotalValue - newDailyChange
 
         return {
           ...prev,
-          totalValue: newTotalValue,
-          dailyChange: newDailyChange,
-          dailyChangePercent: Math.max(newChangePercent, 1.8) // Always at least 1.8% positive
+          totalValue: Math.round(newTotalValue),
+          dailyChange: Math.round(newDailyChange),
+          dailyChangePercent: Math.round(dailyChangePercent * 100) / 100 // Round to 2 decimal places
         }
       })
     }, 1000) // Update every second
 
     const marketInterval = setInterval(() => {
       setMarketData(prev => ({
-        nse: {
-          ...prev.nse,
-          allShareIndex: prev.nse.allShareIndex + (Math.random() - 0.5) * 50,
-          volume: prev.nse.volume + Math.floor(Math.random() * 5000000),
-          marketCap: prev.nse.marketCap + (Math.random() - 0.5) * 100000000000
+        ngx: {
+          ...prev.ngx,
+          allShareIndex: prev.ngx.allShareIndex + (Math.random() - 0.5) * 50,
+          volume: prev.ngx.volume + Math.floor(Math.random() * 5000000),
+          marketCap: prev.ngx.marketCap + (Math.random() - 0.5) * 100000000000
         },
         quidax: {
           ...prev.quidax,
